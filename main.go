@@ -1,6 +1,7 @@
 package main
 
 import (
+	"example/go_api_swe/database"
 	"example/go_api_swe/models"
 	"fmt"
 	"time"
@@ -14,6 +15,10 @@ var transaksi = []models.Transaksi{
 	{TransaksiID: 2, NamaProduk: "Mie Sedap", Harga: 3000, JumlahTerjual: 5, TotalHarga: 15000, Tanggal: time.Now()},
 }
 
+var produk = []models.Produk{
+	{ProdukID: "1", Nama: "Indomie", Stok: 100, Harga: 2500, HargaBeli: 2000, Foto: "indomie.jpg", Supplier: "PT. Indofood"},
+}
+
 
 func getTransaksi(context *gin.Context) {
 	fmt.Println(transaksi)
@@ -21,24 +26,30 @@ func getTransaksi(context *gin.Context) {
 }
 
 func getProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, models.Produk{})
+	context.IndentedJSON(http.StatusOK, produk)
 }
 
 func addProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, models.Produk{})
+	context.IndentedJSON(http.StatusOK, produk)
 }
 
 func updateProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, models.Produk{})
+	context.IndentedJSON(http.StatusOK, produk)
 }
 
 
 
 func main() {
-	router := gin.Default()
-	router.GET("/transaksi", getTransaksi)
-	router.GET("/produk", getProduk)
-	router.POST("/produk", addProduk)
-	router.PUT("/produk", updateProduk)
-	router.Run("localhost:8080")
+	// router := gin.Default()
+	// router.GET("/transaksi", getTransaksi)
+	// router.GET("/produk", getProduk)
+	// router.POST("/produk", addProduk)
+	// router.PUT("/produk", updateProduk)
+	// router.Run("localhost:8080")
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/selectuser", database.Api_selectAllData)
+	http.ListenAndServe(":5050", mux)
+
 }
