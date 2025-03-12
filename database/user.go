@@ -118,6 +118,16 @@ func addData(username string, password string, role string) {
     }
 }
 
+// func deleteUserById(id string) {
+// 	db := Koneksi()
+// 	statement, err := db.Prepare("DELETE FROM users WHERE user_id = $1")
+// 	if err != nil {
+// 		panic(err.Error())
+// 	} else {
+// 		statement.Exec(id)
+// 	}
+// }
+
 
 // connect
 func Koneksi() *sql.DB {
@@ -203,6 +213,33 @@ func Api_getUserByName(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, string(dataJson))
 	}
 
+}
+
+func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
+    var user User
+    err := json.NewDecoder(r.Body).Decode(&user)
+
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    if user.User_id == 0 {
+        http.Error(w, "no id found", http.StatusBadRequest)
+        return
+    }
+
+    db := Koneksi()
+    statement, err := db.Prepare("DELETE FROM users WHERE user_id = $1")
+    if err != nil {
+        panic(err.Error())
+    } else {
+        _, err = statement.Exec(user.User_id)
+        if err != nil {
+            panic(err.Error())
+        }
+    }
+    w.WriteHeader(http.StatusNoContent)
 }
 
 // func Api_getNameAddress(w http.ResponseWriter, r *http.Request) {

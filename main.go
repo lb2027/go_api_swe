@@ -16,7 +16,7 @@ var transaksi = []models.Transaksi{
 }
 
 var produk = []database.Produk{
-	{ProdukID: "1", Nama: "Indomie", Stok: 100, Harga: 2500, HargaBeli: 2000, Foto: "indomie.jpg", Supplier: "PT. Indofood"},
+	{ProdukID: 1, Nama: "Indomie", Stok: 100, Harga: 2500, HargaBeli: 2000, Foto: "indomie.jpg", Supplier: "PT. Indofood"},
 }
 
 
@@ -51,6 +51,10 @@ func main() {
 
 	mux.HandleFunc("/selectuser", database.Api_selectAllData)
 	mux.HandleFunc("/adduser", database.API_add)
+	mux.HandleFunc(("/deleteuser"), database.Api_deleteUser)
+	// mux.HandleFunc("/updateuser", database.API_update)
+	// mux.HandleFunc("/deleteuser", database.API_delete)
+	mux.HandleFunc("/selectproduk", database.Api_selectAllProduk)
 	http.ListenAndServe(":5050", mux)
 
 }
