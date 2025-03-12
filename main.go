@@ -15,7 +15,7 @@ var transaksi = []models.Transaksi{
 	{TransaksiID: 2, NamaProduk: "Mie Sedap", Harga: 3000, JumlahTerjual: 5, TotalHarga: 15000, Tanggal: time.Now()},
 }
 
-var produk = []models.Produk{
+var produk = []database.Produk{
 	{ProdukID: "1", Nama: "Indomie", Stok: 100, Harga: 2500, HargaBeli: 2000, Foto: "indomie.jpg", Supplier: "PT. Indofood"},
 }
 
@@ -50,6 +50,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/selectuser", database.Api_selectAllData)
+	mux.HandleFunc("/adduser", database.API_add)
 	http.ListenAndServe(":5050", mux)
 
 }

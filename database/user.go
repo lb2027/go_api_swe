@@ -141,11 +141,18 @@ func Koneksi() *sql.DB {
 }
 
 func API_add(w http.ResponseWriter, r *http.Request) {
-	nama := r.FormValue("nama")
-	email := r.FormValue("email")
-	alamat := r.FormValue("alamat")
+	var user User
+	// username := r.FormValue("username")
+	// password := r.FormValue("password")
+	// role := r.FormValue("role")
+	err := json.NewDecoder(r.Body).Decode(&user)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
 
-	addData(nama, email, alamat)
+	// fmt.Fprintf(w, "User: %+v", user)
+	addData(user.Username, user.Password, user.Role)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(`{"message": "User added successfully"}`))
 }
@@ -176,7 +183,7 @@ func Api_getUserByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err.Error())
 	} else {
-		io.WriteString(w, string(dataJson))
+		w.Write(dataJson)
 	}
 
 }
@@ -200,7 +207,7 @@ func Api_getUserByName(w http.ResponseWriter, r *http.Request) {
 
 // func Api_getNameAddress(w http.ResponseWriter, r *http.Request) {
 // 	address := r.URL.Query().Get("address")
-// 	if address == "" {
+// 	if address == "" {	
 // 		http.Error(w, "no id found", http.StatusBadRequest)
 // 		return
 // 	}
