@@ -104,6 +104,16 @@ func updateDataProduk(id string, nama string, stok int, harga int, harga_beli in
 	}
 }
 
+func deleteDataProduk(id string) {
+	db := Koneksi()
+	statement, err := db.Prepare("DELETE FROM produk WHERE produk_id = $1")
+	if err != nil {
+		panic(err.Error())
+	} else {
+		statement.Exec(id)
+	}
+}
+
 func Api_selectAllProduk(w http.ResponseWriter, r *http.Request) {
 	produk := select_allProduk()
 	
@@ -121,4 +131,39 @@ func Api_selectAllProduk(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func API_addProduk(w http.ResponseWriter, r *http.Request) {
+	var produk Produk
+	err := json.NewDecoder(r.Body).Decode(&produk)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	addDataProduk(produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
+}
+
+func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
+	var produk Produk
+	err := json.NewDecoder(r.Body).Decode(&produk)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updateDataProduk(string(produk.ProdukID), produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
+}
+
+func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
+	var produk Produk
+	err := json.NewDecoder(r.Body).Decode(&produk)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	deleteDataProduk(string(produk.ProdukID))
+}
 

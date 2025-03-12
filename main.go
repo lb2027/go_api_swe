@@ -2,60 +2,26 @@ package main
 
 import (
 	"example/go_api_swe/database"
-	"example/go_api_swe/models"
-	"fmt"
-	"time"
 
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
-var transaksi = []models.Transaksi{
-	{TransaksiID: 1, NamaProduk: "Indomie", Harga: 2500, JumlahTerjual: 10, TotalHarga: 25000, Tanggal: time.Now()},
-	{TransaksiID: 2, NamaProduk: "Mie Sedap", Harga: 3000, JumlahTerjual: 5, TotalHarga: 15000, Tanggal: time.Now()},
-}
-
-var produk = []database.Produk{
-	{ProdukID: 1, Nama: "Indomie", Stok: 100, Harga: 2500, HargaBeli: 2000, Foto: "indomie.jpg", Supplier: "PT. Indofood"},
-}
-
-
-func getTransaksi(context *gin.Context) {
-	fmt.Println(transaksi)
-	context.IndentedJSON(http.StatusOK, transaksi)
-}
-
-func getProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, produk)
-}
-
-func addProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, produk)
-}
-
-func updateProduk(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, produk)
-}
-
 
 
 func main() {
-	// router := gin.Default()
-	// router.GET("/transaksi", getTransaksi)
-	// router.GET("/produk", getProduk)
-	// router.POST("/produk", addProduk)
-	// router.PUT("/produk", updateProduk)
-	// router.Run("localhost:8080")
-
+	
 	mux := http.NewServeMux()
 
+	// CRUD User
 	mux.HandleFunc("/selectuser", database.Api_selectAllData)
 	mux.HandleFunc("/adduser", database.API_add)
 	mux.HandleFunc(("/deleteuser"), database.Api_deleteUser)
 	mux.HandleFunc(("/updateuser"), database.Api_updateUser)
-	// mux.HandleFunc("/updateuser", database.API_update)
-	// mux.HandleFunc("/deleteuser", database.API_delete)
+
+	// CRUD Produk
 	mux.HandleFunc("/selectproduk", database.Api_selectAllProduk)
+	mux.HandleFunc("/addproduk", database.API_addProduk)
+	mux.HandleFunc("/deleteproduk", database.Api_deleteProduk)
+	mux.HandleFunc("/updateproduk", database.Api_updateProduk)
 	http.ListenAndServe(":5050", mux)
 
 }
