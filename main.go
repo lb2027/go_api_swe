@@ -52,6 +52,7 @@ func main() {
 	mux.HandleFunc("/selectuser", database.Api_selectAllData)
 	mux.HandleFunc("/adduser", database.API_add)
 	mux.HandleFunc(("/deleteuser"), database.Api_deleteUser)
+	mux.HandleFunc(("/updateuser"), database.Api_updateUser)
 	// mux.HandleFunc("/updateuser", database.API_update)
 	// mux.HandleFunc("/deleteuser", database.API_delete)
 	mux.HandleFunc("/selectproduk", database.Api_selectAllProduk)

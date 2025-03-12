@@ -242,6 +242,32 @@ func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusNoContent)
 }
 
+func Api_updateUser(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if user.User_id == 0 {
+		http.Error(w, "no id found", http.StatusBadRequest)
+		return
+	}
+
+	db := Koneksi()
+	statement, err := db.Prepare("UPDATE users SET username = $1, password = $2, role = $3 WHERE user_id = $4")
+	if err != nil {
+		panic(err.Error())
+	} else {
+		_, err = statement.Exec(user.Username, user.Password, user.Role, user.User_id)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // func Api_getNameAddress(w http.ResponseWriter, r *http.Request) {
 // 	address := r.URL.Query().Get("address")
 // 	if address == "" {	
