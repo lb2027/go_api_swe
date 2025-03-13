@@ -40,49 +40,49 @@ func select_allProduk() []Produk {
 	return produkArray
 }
 
-func getProdukById(id string) []Produk {
-	db := Koneksi()
-	var produk = Produk{}
-	var produkArray []Produk
+// func getProdukById(id string) []Produk {
+// 	db := Koneksi()
+// 	var produk = Produk{}
+// 	var produkArray []Produk
 
-	statement, err := db.Query("SELECT produk_id, nama, stok, harga, harga_beli, foto, supplier FROM produk WHERE produk_id = $1", id)
+// 	statement, err := db.Query("SELECT produk_id, nama, stok, harga, harga_beli, foto, supplier FROM produk WHERE produk_id = $1", id)
 
-	if err != nil {
-		panic(err.Error())
-	} else {
-		for statement.Next() {
-			err = statement.Scan(&produk.ProdukID, &produk.Nama, &produk.Stok, &produk.Harga, &produk.HargaBeli, &produk.Foto, &produk.Supplier)
-			if err != nil {
-				panic(err.Error())
-			} else {
-				produkArray = append(produkArray, Produk{ProdukID: produk.ProdukID, Nama: produk.Nama, Stok: produk.Stok, Harga: produk.Harga, HargaBeli: produk.HargaBeli, Foto: produk.Foto, Supplier: produk.Supplier})
-			}
-		}
-	}
-	return produkArray
-}
+// 	if err != nil {
+// 		panic(err.Error())
+// 	} else {
+// 		for statement.Next() {
+// 			err = statement.Scan(&produk.ProdukID, &produk.Nama, &produk.Stok, &produk.Harga, &produk.HargaBeli, &produk.Foto, &produk.Supplier)
+// 			if err != nil {
+// 				panic(err.Error())
+// 			} else {
+// 				produkArray = append(produkArray, Produk{ProdukID: produk.ProdukID, Nama: produk.Nama, Stok: produk.Stok, Harga: produk.Harga, HargaBeli: produk.HargaBeli, Foto: produk.Foto, Supplier: produk.Supplier})
+// 			}
+// 		}
+// 	}
+// 	return produkArray
+// }
 
-func getProdukByname(name string) []Produk {
-	db := Koneksi()
-	var produk = Produk{}
-	var produkArray []Produk
+// func getProdukByname(name string) []Produk {
+// 	db := Koneksi()
+// 	var produk = Produk{}
+// 	var produkArray []Produk
 
-	statement, err := db.Query("SELECT produk_id, nama, stok, harga, harga_beli, foto, supplier FROM produk WHERE nama = $1", name)
+// 	statement, err := db.Query("SELECT produk_id, nama, stok, harga, harga_beli, foto, supplier FROM produk WHERE nama = $1", name)
 
-	if err != nil {
-		panic(err.Error())
-	} else {
-		for statement.Next() {
-			err = statement.Scan(&produk.ProdukID, &produk.Nama, &produk.Stok, &produk.Harga, &produk.HargaBeli, &produk.Foto, &produk.Supplier)
-			if err != nil {
-				panic(err.Error())
-			} else {
-				produkArray = append(produkArray, Produk{ProdukID: produk.ProdukID, Nama: produk.Nama, Stok: produk.Stok, Harga: produk.Harga, HargaBeli: produk.HargaBeli, Foto: produk.Foto, Supplier: produk.Supplier})
-			}
-		}
-	}
-	return produkArray
-}
+// 	if err != nil {
+// 		panic(err.Error())
+// 	} else {
+// 		for statement.Next() {
+// 			err = statement.Scan(&produk.ProdukID, &produk.Nama, &produk.Stok, &produk.Harga, &produk.HargaBeli, &produk.Foto, &produk.Supplier)
+// 			if err != nil {
+// 				panic(err.Error())
+// 			} else {
+// 				produkArray = append(produkArray, Produk{ProdukID: produk.ProdukID, Nama: produk.Nama, Stok: produk.Stok, Harga: produk.Harga, HargaBeli: produk.HargaBeli, Foto: produk.Foto, Supplier: produk.Supplier})
+// 			}
+// 		}
+// 	}
+// 	return produkArray
+// }
 
 func addDataProduk(nama string, stok int, harga float64, harga_beli float64, foto string, supplier string) {
 	db := Koneksi()
@@ -164,7 +164,7 @@ func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deleteDataProduk(string(produk.ProdukID))
+	deleteDataProduk(fmt.Sprint(produk.ProdukID))
 }
 
 
