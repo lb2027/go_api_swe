@@ -84,7 +84,7 @@ func getProdukByname(name string) []Produk {
 	return produkArray
 }
 
-func addDataProduk(nama string, stok int, harga int, harga_beli int, foto string, supplier string) {
+func addDataProduk(nama string, stok int, harga float64, harga_beli float64, foto string, supplier string) {
 	db := Koneksi()
 	statement, err := db.Prepare("INSERT INTO produk (nama, stok, harga, harga_beli, foto, supplier) VALUES ($1, $2, $3, $4, $5, $6)")
 	if err != nil {
@@ -94,7 +94,7 @@ func addDataProduk(nama string, stok int, harga int, harga_beli int, foto string
 	}
 }
 
-func updateDataProduk(id string, nama string, stok int, harga int, harga_beli int, foto string, supplier string) {
+func updateDataProduk(id int, nama string, stok int, harga int, harga_beli int, foto string, supplier string) {
 	db := Koneksi()
 	statement, err := db.Prepare("UPDATE produk SET nama = $1, stok = $2, harga = $3, harga_beli = $4, foto = $5, supplier = $6 WHERE produk_id = $7")
 	if err != nil {
@@ -140,7 +140,7 @@ func API_addProduk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addDataProduk(produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
+	addDataProduk(produk.Nama, produk.Stok, produk.Harga, produk.HargaBeli, produk.Foto, produk.Supplier)
 }
 
 func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
@@ -152,7 +152,7 @@ func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateDataProduk(string(produk.ProdukID), produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
+	updateDataProduk(produk.ProdukID, produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
 }
 
 func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
@@ -166,4 +166,5 @@ func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
 
 	deleteDataProduk(string(produk.ProdukID))
 }
+
 

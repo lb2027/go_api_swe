@@ -8,7 +8,6 @@ import (
 
 
 func main() {
-	
 	mux := http.NewServeMux()
 
 	// CRUD User
@@ -22,6 +21,9 @@ func main() {
 	mux.HandleFunc("/addproduk", database.API_addProduk)
 	mux.HandleFunc("/deleteproduk", database.Api_deleteProduk)
 	mux.HandleFunc("/updateproduk", database.Api_updateProduk)
-	http.ListenAndServe(":5050", mux)
 
+	// GET Transaksi
+	mux.HandleFunc("/selecttransaksi", database.Api_selectAllTransaksi)
+	mux.HandleFunc("/addtransaksi", database.Api_addTransaksi)
+	http.ListenAndServe(":5050", mux)
 }

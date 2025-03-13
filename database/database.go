@@ -16,7 +16,7 @@ func ConnectDB() {
     if err != nil {
         log.Fatal("Error loading .env file")
     }
-
+    
     dsn := os.Getenv("DATABASE_URL")
 
     DB, err = pgxpool.New(context.Background(), dsn)
