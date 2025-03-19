@@ -25,6 +25,7 @@ func generateJWT() (string, error) {
 
 }
 
+
 func MiddleWare(next func(w http.ResponseWriter, r *http.Request))http.Handler{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["token"] != nil {
@@ -52,6 +53,7 @@ func MiddleWare(next func(w http.ResponseWriter, r *http.Request))http.Handler{
 	})
 }
 
+
 func API_generateJWT(h http.ResponseWriter, r *http.Request) {
 	token, err := generateJWT()
 	tokenStr, err := json.Marshal(token)
@@ -61,7 +63,6 @@ func API_generateJWT(h http.ResponseWriter, r *http.Request) {
 		h.Header().Set("Content-Type", "application/json")
 		io.WriteString(h, string(tokenStr))
 	}
-
 }
 
 	

@@ -156,6 +156,7 @@ func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 }
 
 func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var produk Produk
 	err := json.NewDecoder(r.Body).Decode(&produk)
 
@@ -166,5 +167,9 @@ func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
 
 	deleteDataProduk(fmt.Sprint(produk.ProdukID))
 }
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	}
 
 

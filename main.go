@@ -4,7 +4,10 @@ import (
 	"example/go_api_swe/database"
 
 	"net/http"
+
+	"github.com/rs/cors"
 )
+
 
 
 func main() {
@@ -26,11 +29,19 @@ func main() {
 	mux.HandleFunc("/selecttransaksi", database.Api_selectAllTransaksi)
 	mux.HandleFunc("/addtransaksi", database.Api_addTransaksi)
 
-	mux = http.NewServeMux()
-	mux.HandleFunc("/selectuser", database.Api_selectAllData)
-	mux.HandleFunc("/adduser",database.API_add)
-	mux.HandleFunc("/jwt",database.API_generateJWT)
-	mux.HandleFunc("/jwt", database.MiddleWare(database.API_generateJWT))
-	http.ListenAndServe(":5050", mux)
+	// mux = http.NewServeMux()
+	// mux.HandleFunc("/selectuser", database.Api_selectAllData)
+	// mux.HandleFunc("/adduser",database.API_add)
+	// mux.HandleFunc("/jwt",database.API_generateJWT)
+	// mux.HandleFunc("/jwt", database.MiddleWare(database.API_generateJWT))
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},	
+		// AllowedCredentials: true,
+	})
+
+	handler := c.Handler(mux)
+	http.ListenAndServe(":5050", handler)
 }
 
