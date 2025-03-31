@@ -2,43 +2,38 @@ package main
 
 import (
 	"example/go_api_swe/database"
-
 	"net/http"
 
 	"github.com/rs/cors"
 )
 
-
-
 func main() {
 	mux := http.NewServeMux()
 
+	// Public routes (no authentication required)
+	mux.HandleFunc("/login", database.API_generateJWT) // Changed from /jwt to /login
+
+	// Protected routes (require authentication)
 	// CRUD User
-	mux.HandleFunc("/selectuser", database.Api_selectAllData) // sudah
-	mux.HandleFunc("/adduser", database.API_add) // sudah
-	mux.HandleFunc(("/deleteuser"), database.Api_deleteUser)
-	mux.HandleFunc(("/updateuser"), database.Api_updateUser)
+	mux.Handle("/selectuser", database.MiddleWare(database.Api_selectAllData))
+	mux.Handle("/adduser", database.MiddleWare(database.API_add))
+	mux.Handle("/deleteuser", database.MiddleWare(database.Api_deleteUser))
+	mux.Handle("/updateuser", database.MiddleWare(database.Api_updateUser))
 
 	// CRUD Produk
-	mux.HandleFunc("/selectproduk", database.Api_selectAllProduk) // sudah
-	mux.HandleFunc("/addproduk", database.API_addProduk) // sudah
-	mux.HandleFunc("/deleteproduk", database.Api_deleteProduk)
-	mux.HandleFunc("/updateproduk", database.Api_updateProduk)
+	mux.Handle("/selectproduk", database.MiddleWare(database.Api_selectAllProduk))
+	mux.Handle("/addproduk", database.MiddleWare(database.API_addProduk))
+	mux.Handle("/deleteproduk", database.MiddleWare(database.Api_deleteProduk))
+	mux.Handle("/updateproduk", database.MiddleWare(database.Api_updateProduk))
 
 	// GET Transaksi
-	mux.HandleFunc("/selecttransaksi", database.Api_selectAllTransaksi)
-	mux.HandleFunc("/addtransaksi", database.Api_addTransaksi)
-
-	// mux = http.NewServeMux()
-	// mux.HandleFunc("/selectuser", database.Api_selectAllData)
-	// mux.HandleFunc("/adduser",database.API_add)
-	// mux.HandleFunc("/jwt",database.API_generateJWT)
-	// mux.HandleFunc("/jwt", database.MiddleWare(database.API_generateJWT))
+	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
+	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},	
-		// AllowedCredentials: true,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{"Content-Type", "token"}, // Add "token" to allowed headers
 	})
 
 	handler := c.Handler(mux)
