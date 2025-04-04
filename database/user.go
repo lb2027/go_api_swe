@@ -150,6 +150,15 @@ func Koneksi() *sql.DB {
     }
 }
 
+// @Summary Menambahkan user baru
+// @Description Menambahkan data user ke database
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body User true "Data user"
+// @Success 201 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /adduser [post]
 func API_add(w http.ResponseWriter, r *http.Request) {
 	var user User
 	// username := r.FormValue("username")
@@ -181,6 +190,15 @@ func Api_selectAllData(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// @Summary Cari user berdasarkan ID
+// @Description Mengambil data user berdasarkan ID
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id query string true "User ID"
+// @Success 200 {array} User
+// @Failure 400 {object} map[string]string
+// @Router /getuserbyid [get]
 func Api_getUserByID(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -198,6 +216,15 @@ func Api_getUserByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// @Summary Cari user berdasarkan nama
+// @Description Mengambil data user berdasarkan nama
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param name query string true "Username"
+// @Success 200 {array} User
+// @Failure 400 {object} map[string]string
+// @Router /getuserbyname [get]
 func Api_getUserByName(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	if name == "" {
@@ -215,6 +242,15 @@ func Api_getUserByName(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// @Summary Hapus user
+// @Description Menghapus user berdasarkan ID dari body JSON
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body User true "ID user yang akan dihapus"
+// @Success 204 {string} string "No Content"
+// @Failure 400 {object} map[string]string
+// @Router /deleteuser [delete]
 func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
     var user User
     err := json.NewDecoder(r.Body).Decode(&user)
@@ -242,6 +278,15 @@ func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary Update user
+// @Description Memperbarui data user berdasarkan ID
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body User true "Data user yang diperbarui"
+// @Success 204 {string} string "No Content"
+// @Failure 400 {object} map[string]string
+// @Router /updateuser [put]
 func Api_updateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
