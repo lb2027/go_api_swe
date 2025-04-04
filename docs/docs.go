@@ -15,8 +15,11 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "paths": {}
 =======
+=======
+>>>>>>> 6409ebd (swaggy)
     "paths": {
         "/addproduk": {
             "post": {
@@ -587,11 +590,15 @@ const docTemplate = `{
             }
         }
     }
+<<<<<<< HEAD
 >>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
+=======
+>>>>>>> 6409ebd (swaggy)
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
+<<<<<<< HEAD
 <<<<<<< HEAD
 	Version:          "",
 	Host:             "",
@@ -600,13 +607,18 @@ var SwaggerInfo = &swag.Spec{
 	Title:            "",
 	Description:      "",
 =======
+=======
+>>>>>>> 6409ebd (swaggy)
 	Version:          "1.0",
 	Host:             "localhost:5050",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Frozen Food",
 	Description:      "Sistem REST API untuk manajemen stok produk frozen food, pencatatan transaksi, serta autentikasi pengguna menggunakan JWT.",
+<<<<<<< HEAD
 >>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
+=======
+>>>>>>> 6409ebd (swaggy)
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

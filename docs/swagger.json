@@ -2,10 +2,13 @@
     "swagger": "2.0",
     "info": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "contact": {}
     },
     "paths": {}
 =======
+=======
+>>>>>>> 6409ebd (swaggy)
         "description": "Sistem REST API untuk manajemen stok produk frozen food, pencatatan transaksi, serta autentikasi pengguna menggunakan JWT.",
         "title": "Frozen Food",
         "contact": {},
@@ -583,5 +586,8 @@
             }
         }
     }
+<<<<<<< HEAD
 >>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
+=======
+>>>>>>> 6409ebd (swaggy)
 }

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // var transaksi = []models.Transaksi{
 // 	{TransaksiID: 1, NamaProduk: "Indomie", Harga: 2500, JumlahTerjual: 10, TotalHarga: 25000, Tanggal: time.Now()},
 // 	{TransaksiID: 2, NamaProduk: "Mie Sedap", Harga: 3000, JumlahTerjual: 5, TotalHarga: 15000, Tanggal: time.Now()},
@@ -33,6 +34,8 @@
 // 	// router.PUT("/produk", updateProduk)
 // 	// router.Run("localhost:8080")
 =======
+=======
+>>>>>>> 6409ebd (swaggy)
 var transaksi = []models.Transaksi{
 	{TransaksiID: 1, NamaProduk: "Indomie", Harga: 2500, JumlahTerjual: 10, TotalHarga: 25000, Tanggal: time.Now()},
 	{TransaksiID: 2, NamaProduk: "Mie Sedap", Harga: 3000, JumlahTerjual: 5, TotalHarga: 15000, Tanggal: time.Now()},
@@ -66,4 +69,7 @@ func updateProduk(context *gin.Context) {
 	// router.POST("/produk", addProduk)
 	// router.PUT("/produk", updateProduk)
 	// router.Run("localhost:8080")
+<<<<<<< HEAD
 >>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
+=======
+>>>>>>> 6409ebd (swaggy)

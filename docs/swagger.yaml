@@ -1,8 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 info:
   contact: {}
 paths: {}
 =======
+=======
+>>>>>>> 6409ebd (swaggy)
 basePath: /
 definitions:
   database.Produk:
@@ -383,5 +386,8 @@ paths:
       summary: Update user
       tags:
       - User
+<<<<<<< HEAD
 >>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
+=======
+>>>>>>> 6409ebd (swaggy)
 swagger: "2.0"
