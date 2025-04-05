@@ -6,16 +6,22 @@ import (
 
 	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
 
-	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
-
+	httpSwagger "github.com/swaggo/http-swagger" // Swagger UI
 	"github.com/rs/cors"
 )
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name token
 
 func main() {
 	mux := http.NewServeMux()
 
+	// Swagger UI endpoint
+	mux.Handle("/swagger/", httpSwagger.WrapHandler)
+
 	// Public routes (no authentication required)
-	mux.HandleFunc("/login", database.API_generateJWT) // Changed from /jwt to /login
+	mux.HandleFunc("/login", database.API_generateJWT)
 
 	// Protected routes (pakai middleware JWT)
 	// CRUD User
@@ -34,16 +40,15 @@ func main() {
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
 	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
 
+	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type", "token"},
 	})
 
-
-
 	handler := c.Handler(mux)
 
-	// Start server
+	// Start the server
 	http.ListenAndServe(":5050", handler)
 }

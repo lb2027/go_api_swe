@@ -14,15 +14,14 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "paths": {}
-=======
-=======
->>>>>>> 6409ebd (swaggy)
     "paths": {
         "/addproduk": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data produk ke dalam database",
                 "consumes": [
                     "application/json"
@@ -69,6 +68,11 @@ const docTemplate = `{
         },
         "/addtransaksi": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data transaksi baru",
                 "consumes": [
                     "application/json"
@@ -115,6 +119,11 @@ const docTemplate = `{
         },
         "/adduser": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data user ke database",
                 "consumes": [
                     "application/json"
@@ -161,6 +170,11 @@ const docTemplate = `{
         },
         "/deleteproduk": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -207,6 +221,11 @@ const docTemplate = `{
         },
         "/deleteuser": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus user berdasarkan ID dari body JSON",
                 "consumes": [
                     "application/json"
@@ -238,50 +257,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/generate-jwt": {
-            "post": {
-                "description": "Menghasilkan JWT token untuk autentikasi API",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Generate JWT Token",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "405": {
-                        "description": "Method Not Allowed",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -380,8 +355,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/login": {
+            "post": {
+                "description": "Menghasilkan JWT token untuk autentikasi API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate JWT Token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/selectproduk": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data produk dari database",
                 "consumes": [
                     "application/json"
@@ -408,6 +432,11 @@ const docTemplate = `{
         },
         "/selecttransaksi": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data transaksi dari database",
                 "consumes": [
                     "application/json"
@@ -432,8 +461,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/selectuser": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Menampilakan semua user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/updateproduk": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui informasi produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -480,6 +536,11 @@ const docTemplate = `{
         },
         "/updateuser": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui data user berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -589,36 +650,24 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+        }
     }
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-<<<<<<< HEAD
-<<<<<<< HEAD
 	Version:          "",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",
-=======
-=======
->>>>>>> 6409ebd (swaggy)
-	Version:          "1.0",
-	Host:             "localhost:5050",
-	BasePath:         "/",
-	Schemes:          []string{},
-	Title:            "Frozen Food",
-	Description:      "Sistem REST API untuk manajemen stok produk frozen food, pencatatan transaksi, serta autentikasi pengguna menggunakan JWT.",
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-info:
-  contact: {}
-paths: {}
-=======
-=======
->>>>>>> 6409ebd (swaggy)
-basePath: /
 definitions:
   database.Produk:
     properties:
@@ -51,13 +42,8 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:5050
 info:
   contact: {}
-  description: Sistem REST API untuk manajemen stok produk frozen food, pencatatan
-    transaksi, serta autentikasi pengguna menggunakan JWT.
-  title: Frozen Food
-  version: "1.0"
 paths:
   /addproduk:
     post:
@@ -86,6 +72,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Tambah produk baru
       tags:
       - Produk
@@ -116,6 +104,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Tambah transaksi
       tags:
       - Transaksi
@@ -146,6 +136,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Menambahkan user baru
       tags:
       - User
@@ -176,6 +168,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Hapus produk
       tags:
       - Produk
@@ -204,38 +198,11 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Hapus user
       tags:
       - User
-  /generate-jwt:
-    post:
-      consumes:
-      - application/json
-      description: Menghasilkan JWT token untuk autentikasi API
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "405":
-          description: Method Not Allowed
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Generate JWT Token
-      tags:
-      - Auth
   /getuserbyid:
     get:
       consumes:
@@ -294,6 +261,35 @@ paths:
       summary: Cari user berdasarkan nama
       tags:
       - User
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Menghasilkan JWT token untuk autentikasi API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate JWT Token
+      tags:
+      - Auth
   /selectproduk:
     get:
       consumes:
@@ -308,6 +304,8 @@ paths:
             items:
               $ref: '#/definitions/database.Produk'
             type: array
+      security:
+      - BearerAuth: []
       summary: Ambil semua produk
       tags:
       - Produk
@@ -325,9 +323,24 @@ paths:
             items:
               $ref: '#/definitions/database.Transaksi'
             type: array
+      security:
+      - BearerAuth: []
       summary: Ambil semua transaksi
       tags:
       - Transaksi
+  /selectuser:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Menampilakan semua user
+      tags:
+      - User
   /updateproduk:
     put:
       consumes:
@@ -355,6 +368,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update data produk
       tags:
       - Produk
@@ -383,11 +398,14 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update user
       tags:
       - User
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: token
+    type: apiKey
 swagger: "2.0"

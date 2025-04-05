@@ -40,6 +40,7 @@ func Select_allTransaksi() []Transaksi {
 // @Produce json
 // @Success 200 {array} Transaksi
 // @Router /selecttransaksi [get]
+// @Security BearerAuth
 func Api_selectAllTransaksi(w http.ResponseWriter, r *http.Request) {
 	dataTransaksi := Select_allTransaksi()
 	dataJson, err := json.Marshal(dataTransaksi)
@@ -74,6 +75,7 @@ func AddDataTransaksi(namaProduk string, harga float64, jumlahTerjual int, total
 // @Success 201 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /addtransaksi [post]
+// @Security BearerAuth
 func Api_addTransaksi(w http.ResponseWriter, r *http.Request) {
     var transaksi Transaksi
     err := json.NewDecoder(r.Body).Decode(&transaksi)

@@ -116,6 +116,7 @@ func deleteDataProduk(id string) {
 
 // @Summary Ambil semua produk
 // @Description Mengambil semua data produk dari database
+// @Security BearerAuth
 // @Tags Produk
 // @Accept json
 // @Produce json
@@ -147,6 +148,7 @@ func Api_selectAllProduk(w http.ResponseWriter, r *http.Request) {
 // @Success 201 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /addproduk [post]
+// @Security BearerAuth
 func API_addProduk(w http.ResponseWriter, r *http.Request) {
 	var produk Produk
 	err := json.NewDecoder(r.Body).Decode(&produk)
@@ -168,6 +170,7 @@ func API_addProduk(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /updateproduk [put]
+// @Security BearerAuth
 func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 	var produk Produk
 	err := json.NewDecoder(r.Body).Decode(&produk)
@@ -189,6 +192,7 @@ func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /deleteproduk [delete]
+// @Security BearerAuth
 func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	var produk Produk

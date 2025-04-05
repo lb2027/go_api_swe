@@ -1,24 +1,16 @@
 {
     "swagger": "2.0",
     "info": {
-<<<<<<< HEAD
-<<<<<<< HEAD
         "contact": {}
     },
-    "paths": {}
-=======
-=======
->>>>>>> 6409ebd (swaggy)
-        "description": "Sistem REST API untuk manajemen stok produk frozen food, pencatatan transaksi, serta autentikasi pengguna menggunakan JWT.",
-        "title": "Frozen Food",
-        "contact": {},
-        "version": "1.0"
-    },
-    "host": "localhost:5050",
-    "basePath": "/",
     "paths": {
         "/addproduk": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data produk ke dalam database",
                 "consumes": [
                     "application/json"
@@ -65,6 +57,11 @@
         },
         "/addtransaksi": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data transaksi baru",
                 "consumes": [
                     "application/json"
@@ -111,6 +108,11 @@
         },
         "/adduser": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data user ke database",
                 "consumes": [
                     "application/json"
@@ -157,6 +159,11 @@
         },
         "/deleteproduk": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -203,6 +210,11 @@
         },
         "/deleteuser": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus user berdasarkan ID dari body JSON",
                 "consumes": [
                     "application/json"
@@ -234,50 +246,6 @@
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/generate-jwt": {
-            "post": {
-                "description": "Menghasilkan JWT token untuk autentikasi API",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Generate JWT Token",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "405": {
-                        "description": "Method Not Allowed",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -376,8 +344,57 @@
                 }
             }
         },
+        "/login": {
+            "post": {
+                "description": "Menghasilkan JWT token untuk autentikasi API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate JWT Token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/selectproduk": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data produk dari database",
                 "consumes": [
                     "application/json"
@@ -404,6 +421,11 @@
         },
         "/selecttransaksi": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data transaksi dari database",
                 "consumes": [
                     "application/json"
@@ -428,8 +450,35 @@
                 }
             }
         },
+        "/selectuser": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Menampilakan semua user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/updateproduk": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui informasi produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -476,6 +525,11 @@
         },
         "/updateuser": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui data user berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -585,9 +639,12 @@
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+        }
     }
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
 }
