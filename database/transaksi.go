@@ -33,6 +33,13 @@ func Select_allTransaksi() []Transaksi {
 	return dataTransaksi
 }
 
+// @Summary Ambil semua transaksi
+// @Description Mengambil semua data transaksi dari database
+// @Tags Transaksi
+// @Accept json
+// @Produce json
+// @Success 200 {array} Transaksi
+// @Router /selecttransaksi [get]
 func Api_selectAllTransaksi(w http.ResponseWriter, r *http.Request) {
 	dataTransaksi := Select_allTransaksi()
 	dataJson, err := json.Marshal(dataTransaksi)
@@ -58,6 +65,15 @@ func AddDataTransaksi(namaProduk string, harga float64, jumlahTerjual int, total
     }
 }
 
+// @Summary Tambah transaksi
+// @Description Menambahkan data transaksi baru
+// @Tags Transaksi
+// @Accept json
+// @Produce json
+// @Param transaksi body Transaksi true "Data transaksi"
+// @Success 201 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /addtransaksi [post]
 func Api_addTransaksi(w http.ResponseWriter, r *http.Request) {
     var transaksi Transaksi
     err := json.NewDecoder(r.Body).Decode(&transaksi)

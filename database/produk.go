@@ -114,6 +114,13 @@ func deleteDataProduk(id string) {
 	}
 }
 
+// @Summary Ambil semua produk
+// @Description Mengambil semua data produk dari database
+// @Tags Produk
+// @Accept json
+// @Produce json
+// @Success 200 {array} Produk
+// @Router /selectproduk [get]
 func Api_selectAllProduk(w http.ResponseWriter, r *http.Request) {
 	produk := select_allProduk()
 	
@@ -131,6 +138,15 @@ func Api_selectAllProduk(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// @Summary Tambah produk baru
+// @Description Menambahkan data produk ke dalam database
+// @Tags Produk
+// @Accept json
+// @Produce json
+// @Param produk body Produk true "Data produk"
+// @Success 201 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /addproduk [post]
 func API_addProduk(w http.ResponseWriter, r *http.Request) {
 	var produk Produk
 	err := json.NewDecoder(r.Body).Decode(&produk)
@@ -143,6 +159,15 @@ func API_addProduk(w http.ResponseWriter, r *http.Request) {
 	addDataProduk(produk.Nama, produk.Stok, produk.Harga, produk.HargaBeli, produk.Foto, produk.Supplier)
 }
 
+// @Summary Update data produk
+// @Description Memperbarui informasi produk berdasarkan ID
+// @Tags Produk
+// @Accept json
+// @Produce json
+// @Param produk body Produk true "Data produk yang diperbarui"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /updateproduk [put]
 func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 	var produk Produk
 	err := json.NewDecoder(r.Body).Decode(&produk)
@@ -155,6 +180,15 @@ func Api_updateProduk(w http.ResponseWriter, r *http.Request) {
 	updateDataProduk(produk.ProdukID, produk.Nama, produk.Stok, int(produk.Harga), int(produk.HargaBeli), produk.Foto, produk.Supplier)
 }
 
+// @Summary Hapus produk
+// @Description Menghapus produk berdasarkan ID
+// @Tags Produk
+// @Accept json
+// @Produce json
+// @Param produk body Produk true "Produk yang akan dihapus (berdasarkan ID)"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /deleteproduk [delete]
 func Api_deleteProduk(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	var produk Produk

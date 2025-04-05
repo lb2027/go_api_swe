@@ -1,4 +1,387 @@
+<<<<<<< HEAD
 info:
   contact: {}
 paths: {}
+=======
+basePath: /
+definitions:
+  database.Produk:
+    properties:
+      foto:
+        type: string
+      harga:
+        type: number
+      harga_beli:
+        type: number
+      name:
+        type: string
+      produk_id:
+        type: integer
+      stok:
+        type: integer
+      supplier:
+        type: string
+    type: object
+  database.Transaksi:
+    properties:
+      harga:
+        type: number
+      jumlah_terjual:
+        type: integer
+      nama_produk:
+        type: string
+      tanggal:
+        type: string
+      total_harga:
+        type: number
+      transaksi_id:
+        type: integer
+    type: object
+  database.User:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:5050
+info:
+  contact: {}
+  description: Sistem REST API untuk manajemen stok produk frozen food, pencatatan
+    transaksi, serta autentikasi pengguna menggunakan JWT.
+  title: Frozen Food
+  version: "1.0"
+paths:
+  /addproduk:
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan data produk ke dalam database
+      parameters:
+      - description: Data produk
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah produk baru
+      tags:
+      - Produk
+  /addtransaksi:
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan data transaksi baru
+      parameters:
+      - description: Data transaksi
+        in: body
+        name: transaksi
+        required: true
+        schema:
+          $ref: '#/definitions/database.Transaksi'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tambah transaksi
+      tags:
+      - Transaksi
+  /adduser:
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan data user ke database
+      parameters:
+      - description: Data user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Menambahkan user baru
+      tags:
+      - User
+  /deleteproduk:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus produk berdasarkan ID
+      parameters:
+      - description: Produk yang akan dihapus (berdasarkan ID)
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus produk
+      tags:
+      - Produk
+  /deleteuser:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus user berdasarkan ID dari body JSON
+      parameters:
+      - description: ID user yang akan dihapus
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hapus user
+      tags:
+      - User
+  /generate-jwt:
+    post:
+      consumes:
+      - application/json
+      description: Menghasilkan JWT token untuk autentikasi API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate JWT Token
+      tags:
+      - Auth
+  /getuserbyid:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data user berdasarkan ID
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cari user berdasarkan ID
+      tags:
+      - User
+  /getuserbyname:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data user berdasarkan nama
+      parameters:
+      - description: Username
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cari user berdasarkan nama
+      tags:
+      - User
+  /selectproduk:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil semua data produk dari database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Produk'
+            type: array
+      summary: Ambil semua produk
+      tags:
+      - Produk
+  /selecttransaksi:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil semua data transaksi dari database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Transaksi'
+            type: array
+      summary: Ambil semua transaksi
+      tags:
+      - Transaksi
+  /updateproduk:
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui informasi produk berdasarkan ID
+      parameters:
+      - description: Data produk yang diperbarui
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update data produk
+      tags:
+      - Produk
+  /updateuser:
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data user berdasarkan ID
+      parameters:
+      - description: Data user yang diperbarui
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update user
+      tags:
+      - User
+>>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
 swagger: "2.0"

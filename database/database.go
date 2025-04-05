@@ -11,6 +11,12 @@ import (
 
 var DB *pgxpool.Pool
 
+// @title Manajemen Produk & Transaksi API
+// @version 1.0
+// @description API ini terhubung ke PostgreSQL melalui koneksi pool menggunakan `pgx`.
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func ConnectDB() {
     err := godotenv.Load()
     if err != nil {

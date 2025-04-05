@@ -56,6 +56,15 @@ func MiddleWare(next http.HandlerFunc) http.Handler {
 	})
 }
 
+// @Summary Generate JWT Token
+// @Description Menghasilkan JWT token untuk autentikasi API
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 405 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /generate-jwt [post]
 func API_generateJWT(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
