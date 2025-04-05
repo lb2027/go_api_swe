@@ -152,16 +152,12 @@ func Koneksi() *sql.DB {
 
 func API_add(w http.ResponseWriter, r *http.Request) {
 	var user User
-	// username := r.FormValue("username")
-	// password := r.FormValue("password")
-	// role := r.FormValue("role")
 	err := json.NewDecoder(r.Body).Decode(&user)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
-	// fmt.Fprintf(w, "User: %+v", user)
 	addData(user.Username, user.Password, user.Role)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(`{"message": "User added successfully"}`))
