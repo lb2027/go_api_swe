@@ -9,13 +9,16 @@ import (
 	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
 
 	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
+	mux.Handle("/swagger/", httpSwagger.WrapHandler)
 	// Public routes (no authentication required)
 	mux.HandleFunc("/login", database.API_generateJWT) // Changed from /jwt to /login
+	mux.HandleFunc("/register", database.API_register)
 
 	// Protected routes (pakai middleware JWT)
 	// CRUD User
@@ -29,6 +32,8 @@ func main() {
 	mux.Handle("/addproduk", database.MiddleWare(database.API_addProduk))
 	mux.Handle("/deleteproduk", database.MiddleWare(database.Api_deleteProduk))
 	mux.Handle("/updateproduk", database.MiddleWare(database.Api_updateProduk))
+	mux.Handle("/selectProdukById", database.MiddleWare(database.Api_selectProdukById))
+
 
 	// Transaksi
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
@@ -39,8 +44,6 @@ func main() {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type", "token"},
 	})
-
-
 
 	handler := c.Handler(mux)
 

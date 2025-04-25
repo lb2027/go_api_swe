@@ -1,13 +1,11 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-info:
-  contact: {}
-paths: {}
-=======
-=======
->>>>>>> 6409ebd (swaggy)
-basePath: /
 definitions:
+  database.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   database.Produk:
     properties:
       foto:
@@ -51,13 +49,8 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:5050
 info:
   contact: {}
-  description: Sistem REST API untuk manajemen stok produk frozen food, pencatatan
-    transaksi, serta autentikasi pengguna menggunakan JWT.
-  title: Frozen Food
-  version: "1.0"
 paths:
   /addproduk:
     post:
@@ -207,11 +200,18 @@ paths:
       summary: Hapus user
       tags:
       - User
-  /generate-jwt:
+  /login:
     post:
       consumes:
       - application/json
       description: Menghasilkan JWT token untuk autentikasi API
+      parameters:
+      - description: User credentials
+        in: body
+        name: creds
+        required: true
+        schema:
+          $ref: '#/definitions/database.Credentials'
       produces:
       - application/json
       responses:
@@ -221,8 +221,14 @@ paths:
             additionalProperties:
               type: string
             type: object
-        "405":
-          description: Method Not Allowed
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
           schema:
             additionalProperties:
               type: string
@@ -236,64 +242,42 @@ paths:
       summary: Generate JWT Token
       tags:
       - Auth
-  /getuserbyid:
-    get:
+  /register:
+    post:
       consumes:
       - application/json
-      description: Mengambil data user berdasarkan ID
+      description: Registers a new user in the database
       parameters:
-      - description: User ID
-        in: query
-        name: id
+      - description: User credentials
+        in: body
+        name: creds
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/database.Credentials'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            items:
-              $ref: '#/definitions/database.User'
-            type: array
+            additionalProperties:
+              type: string
+            type: object
         "400":
           description: Bad Request
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Cari user berdasarkan ID
-      tags:
-      - User
-  /getuserbyname:
-    get:
-      consumes:
-      - application/json
-      description: Mengambil data user berdasarkan nama
-      parameters:
-      - description: Username
-        in: query
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/database.User'
-            type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Cari user berdasarkan nama
+      summary: Register a new user
       tags:
-      - User
+      - Auth
   /selectproduk:
     get:
       consumes:
@@ -386,8 +370,21 @@ paths:
       summary: Update user
       tags:
       - User
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all user from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.User'
+            type: array
+      summary: Get all user
+      tags:
+      - User
 swagger: "2.0"

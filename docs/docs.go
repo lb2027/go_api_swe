@@ -14,12 +14,6 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "paths": {}
-=======
-=======
->>>>>>> 6409ebd (swaggy)
     "paths": {
         "/addproduk": {
             "post": {
@@ -248,7 +242,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/generate-jwt": {
+        "/login": {
             "post": {
                 "description": "Menghasilkan JWT token untuk autentikasi API",
                 "consumes": [
@@ -261,6 +255,17 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Generate JWT Token",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "creds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Credentials"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -271,8 +276,17 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "405": {
-                        "description": "Method Not Allowed",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -292,9 +306,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/getuserbyid": {
-            "get": {
-                "description": "Mengambil data user berdasarkan ID",
+        "/register": {
+            "post": {
+                "description": "Registers a new user in the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -302,25 +316,27 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Auth"
                 ],
-                "summary": "Cari user berdasarkan ID",
+                "summary": "Register a new user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
+                        "description": "User credentials",
+                        "name": "creds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Credentials"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/database.User"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     },
@@ -332,44 +348,9 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
-                    }
-                }
-            }
-        },
-        "/getuserbyname": {
-            "get": {
-                "description": "Mengambil data user berdasarkan nama",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Cari user berdasarkan nama",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/database.User"
-                            }
-                        }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -520,9 +501,46 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user": {
+            "get": {
+                "description": "Get list of all user from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get all user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.User"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "database.Credentials": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "database.Produk": {
             "type": "object",
             "properties": {
@@ -590,35 +608,16 @@ const docTemplate = `{
             }
         }
     }
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-<<<<<<< HEAD
-<<<<<<< HEAD
 	Version:          "",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",
-=======
-=======
->>>>>>> 6409ebd (swaggy)
-	Version:          "1.0",
-	Host:             "localhost:5050",
-	BasePath:         "/",
-	Schemes:          []string{},
-	Title:            "Frozen Food",
-	Description:      "Sistem REST API untuk manajemen stok produk frozen food, pencatatan transaksi, serta autentikasi pengguna menggunakan JWT.",
-<<<<<<< HEAD
->>>>>>> 6409ebdc0d617977aec2cba661a932d36b318fe4
-=======
->>>>>>> 6409ebd (swaggy)
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
