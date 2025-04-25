@@ -6,11 +6,13 @@ import (
 
 	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
 
-	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
-
 	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger" // Swagger UI
 )
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name token
 
 func main() {
 	mux := http.NewServeMux()
@@ -39,6 +41,7 @@ func main() {
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
 	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
 
+	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
@@ -47,6 +50,6 @@ func main() {
 
 	handler := c.Handler(mux)
 
-	// Start server
+	// Start the server
 	http.ListenAndServe(":5050", handler)
 }

@@ -55,17 +55,17 @@ paths:
   /addproduk:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Menambahkan data produk ke dalam database
       parameters:
-      - description: Data produk
-        in: body
-        name: produk
-        required: true
-        schema:
-          $ref: '#/definitions/database.Produk'
+        - description: Data produk
+          in: body
+          name: produk
+          required: true
+          schema:
+            $ref: "#/definitions/database.Produk"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -79,23 +79,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Tambah produk baru
       tags:
-      - Produk
+        - Produk
   /addtransaksi:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Menambahkan data transaksi baru
       parameters:
-      - description: Data transaksi
-        in: body
-        name: transaksi
-        required: true
-        schema:
-          $ref: '#/definitions/database.Transaksi'
+        - description: Data transaksi
+          in: body
+          name: transaksi
+          required: true
+          schema:
+            $ref: "#/definitions/database.Transaksi"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -109,23 +111,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Tambah transaksi
       tags:
-      - Transaksi
+        - Transaksi
   /adduser:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Menambahkan data user ke database
       parameters:
-      - description: Data user
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/database.User'
+        - description: Data user
+          in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/database.User"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -139,23 +143,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Menambahkan user baru
       tags:
-      - User
+        - User
   /deleteproduk:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: Menghapus produk berdasarkan ID
       parameters:
-      - description: Produk yang akan dihapus (berdasarkan ID)
-        in: body
-        name: produk
-        required: true
-        schema:
-          $ref: '#/definitions/database.Produk'
+        - description: Produk yang akan dihapus (berdasarkan ID)
+          in: body
+          name: produk
+          required: true
+          schema:
+            $ref: "#/definitions/database.Produk"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -169,23 +175,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Hapus produk
       tags:
-      - Produk
+        - Produk
   /deleteuser:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: Menghapus user berdasarkan ID dari body JSON
       parameters:
-      - description: ID user yang akan dihapus
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/database.User'
+        - description: ID user yang akan dihapus
+          in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/database.User"
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -197,23 +205,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Hapus user
       tags:
-      - User
+        - User
   /login:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Menghasilkan JWT token untuk autentikasi API
       parameters:
-      - description: User credentials
-        in: body
-        name: creds
-        required: true
-        schema:
-          $ref: '#/definitions/database.Credentials'
+        - description: User credentials
+          in: body
+          name: creds
+          required: true
+          schema:
+            $ref: "#/definitions/database.Credentials"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -241,21 +251,21 @@ paths:
             type: object
       summary: Generate JWT Token
       tags:
-      - Auth
+        - Auth
   /register:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Registers a new user in the database
       parameters:
-      - description: User credentials
-        in: body
-        name: creds
-        required: true
-        schema:
-          $ref: '#/definitions/database.Credentials'
+        - description: User credentials
+          in: body
+          name: creds
+          required: true
+          schema:
+            $ref: "#/definitions/database.Credentials"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -277,55 +287,72 @@ paths:
             type: object
       summary: Register a new user
       tags:
-      - Auth
+        - Auth
   /selectproduk:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Mengambil semua data produk dari database
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/database.Produk'
+              $ref: "#/definitions/database.Produk"
             type: array
+      security:
+        - BearerAuth: []
       summary: Ambil semua produk
       tags:
-      - Produk
+        - Produk
   /selecttransaksi:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Mengambil semua data transaksi dari database
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/database.Transaksi'
+              $ref: "#/definitions/database.Transaksi"
             type: array
+      security:
+        - BearerAuth: []
       summary: Ambil semua transaksi
       tags:
-      - Transaksi
+        - Transaksi
+  /selectuser:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+        - BearerAuth: []
+      summary: Menampilakan semua user
+      tags:
+        - User
   /updateproduk:
     put:
       consumes:
-      - application/json
+        - application/json
       description: Memperbarui informasi produk berdasarkan ID
       parameters:
-      - description: Data produk yang diperbarui
-        in: body
-        name: produk
-        required: true
-        schema:
-          $ref: '#/definitions/database.Produk'
+        - description: Data produk yang diperbarui
+          in: body
+          name: produk
+          required: true
+          schema:
+            $ref: "#/definitions/database.Produk"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -339,23 +366,25 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Update data produk
       tags:
-      - Produk
+        - Produk
   /updateuser:
     put:
       consumes:
-      - application/json
+        - application/json
       description: Memperbarui data user berdasarkan ID
       parameters:
-      - description: Data user yang diperbarui
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/database.User'
+        - description: Data user yang diperbarui
+          in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/database.User"
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -367,24 +396,26 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+        - BearerAuth: []
       summary: Update user
       tags:
-      - User
+        - User
   /user:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get list of all user from database
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/database.User'
+              $ref: "#/definitions/database.User"
             type: array
       summary: Get all user
       tags:
-      - User
+        - User
 swagger: "2.0"

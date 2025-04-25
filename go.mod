@@ -28,7 +28,10 @@ require (
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+<<<<<<< HEAD
 	github.com/gorilla/mux v1.8.1
+=======
+>>>>>>> 70f93b8c6cd881f5781dbf761d91351ebbd960a1
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.36.0 // indirect

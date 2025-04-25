@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/addproduk": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data produk ke dalam database",
                 "consumes": [
                     "application/json"
@@ -63,6 +68,11 @@ const docTemplate = `{
         },
         "/addtransaksi": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data transaksi baru",
                 "consumes": [
                     "application/json"
@@ -109,6 +119,11 @@ const docTemplate = `{
         },
         "/adduser": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menambahkan data user ke database",
                 "consumes": [
                     "application/json"
@@ -155,6 +170,11 @@ const docTemplate = `{
         },
         "/deleteproduk": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -201,6 +221,11 @@ const docTemplate = `{
         },
         "/deleteuser": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Menghapus user berdasarkan ID dari body JSON",
                 "consumes": [
                     "application/json"
@@ -242,6 +267,7 @@ const docTemplate = `{
                 }
             }
         },
+<<<<<<< HEAD
         "/login": {
             "post": {
                 "description": "Menghasilkan JWT token untuk autentikasi API",
@@ -309,6 +335,11 @@ const docTemplate = `{
         "/register": {
             "post": {
                 "description": "Registers a new user in the database",
+=======
+        "/getuserbyid": {
+            "get": {
+                "description": "Mengambil data user berdasarkan ID",
+>>>>>>> 70f93b8c6cd881f5781dbf761d91351ebbd960a1
                 "consumes": [
                     "application/json"
                 ],
@@ -361,8 +392,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/login": {
+            "post": {
+                "description": "Menghasilkan JWT token untuk autentikasi API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate JWT Token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/selectproduk": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data produk dari database",
                 "consumes": [
                     "application/json"
@@ -389,6 +469,11 @@ const docTemplate = `{
         },
         "/selecttransaksi": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mengambil semua data transaksi dari database",
                 "consumes": [
                     "application/json"
@@ -413,8 +498,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/selectuser": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Menampilakan semua user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/updateproduk": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui informasi produk berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -461,6 +573,11 @@ const docTemplate = `{
         },
         "/updateuser": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Memperbarui data user berdasarkan ID",
                 "consumes": [
                     "application/json"
@@ -606,6 +723,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
         }
     }
 }`
