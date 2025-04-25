@@ -141,7 +141,7 @@ func Koneksi() *sql.DB {
 		host     = "localhost"
 		port     = 5432
 		user     = "postgres"
-		password = "1230"
+		password = "12460"
 		dbname   = "frozen_food"
 	)
 	
@@ -165,7 +165,6 @@ func Koneksi() *sql.DB {
 // @Success 201 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /adduser [post]
-// @Security BearerAuth
 func API_add(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -179,11 +178,6 @@ func API_add(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "User added successfully"}`))
 }
 
-// @Summary Menampilakan semua user
-// @Tags User
-// @Security BearerAuth
-// @Success 200 {object} map[string]interface{}
-// @Router /selectuser [get]
 func Api_selectAllData(w http.ResponseWriter, r *http.Request) {
 
 	dataUser := Select_alluser()
@@ -259,7 +253,6 @@ func Api_selectAllData(w http.ResponseWriter, r *http.Request) {
 // @Success 204 {string} string "No Content"
 // @Failure 400 {object} map[string]string
 // @Router /deleteuser [delete]
-// @Security BearerAuth
 func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
     var user User
     err := json.NewDecoder(r.Body).Decode(&user)
@@ -296,7 +289,6 @@ func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
 // @Success 204 {string} string "No Content"
 // @Failure 400 {object} map[string]string
 // @Router /updateuser [put]
-// @Security BearerAuth
 func Api_updateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)

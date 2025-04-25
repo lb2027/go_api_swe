@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/rs/cors v1.11.1
+	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4
 )
 
@@ -20,7 +21,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
-	github.com/swaggo/http-swagger v1.3.4 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/tools v0.31.0 // indirect
@@ -28,10 +28,6 @@ require (
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-<<<<<<< HEAD
-	github.com/gorilla/mux v1.8.1
-=======
->>>>>>> 70f93b8c6cd881f5781dbf761d91351ebbd960a1
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.36.0 // indirect
