@@ -84,11 +84,43 @@ func addDataProduk(nama string, stok int, harga float64, harga_beli float64, fot
 
 func updateDataProduk(id int, nama string, stok int, harga float64, harga_beli float64, foto string, supplier string) {
 	db := Koneksi()
-	statement, err := db.Prepare("UPDATE produk SET nama = $1, stok = $2, harga = $3, harga_beli = $4, foto = $5, supplier = $6 WHERE produk_id = $7")
+	defer db.Close()
+
+	// Start a transaction
+	tx, err := db.Begin()
 	if err != nil {
 		panic(err.Error())
-	} else {
-		statement.Exec(nama, stok, harga, harga_beli, foto, supplier, id)
+	}
+
+	// Get the original stock value
+	var originalStok int
+	err = tx.QueryRow("SELECT stok FROM produk WHERE produk_id = $1", id).Scan(&originalStok)
+	if err != nil {
+		tx.Rollback()
+		panic(err.Error())
+	}
+
+	// Calculate the stock difference
+	stockDifference := stok - originalStok
+
+	// Update the produk table
+	_, err = tx.Exec("UPDATE produk SET nama = $1, stok = $2, harga = $3, harga_beli = $4, foto = $5, supplier = $6 WHERE produk_id = $7", nama, stok, harga, harga_beli, foto, supplier, id)
+	if err != nil {
+		tx.Rollback()
+		panic(err.Error())
+	}
+
+	// Insert a record into the stok table
+	_, err = tx.Exec("INSERT INTO stok_masuk (produk_id, jumlah) VALUES ($1, $2)", id, stockDifference)
+	if err != nil {
+		tx.Rollback()
+		panic(err.Error())
+	}
+
+	// Commit the transaction
+	err = tx.Commit()
+	if err != nil {
+		panic(err.Error())
 	}
 }
 
@@ -106,8 +138,33 @@ func updateStock(productID int, quantitySold int) error {
 	db := Koneksi()
 	defer db.Close()
 
-	_, err := db.Exec("UPDATE produk SET stok = stok - $1 WHERE produk_id = $2", quantitySold, productID)
-	return err
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Update the produk table
+	_, err = tx.Exec("UPDATE produk SET stok = stok - $1 WHERE produk_id = $2", quantitySold, productID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Insert a record into the stok table
+	_, err = tx.Exec("INSERT INTO stok (produk_id, jumlah) VALUES ($1, $2)", productID, quantitySold)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Commit the transaction
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func Api_addSoldItems(w http.ResponseWriter, r *http.Request) {
@@ -261,4 +318,6 @@ func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
+// pgsql query to rename transaksi table to stok
 
+// DELETE FROM produk WHERE produk_id = $1

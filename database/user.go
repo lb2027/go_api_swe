@@ -142,7 +142,7 @@ func Koneksi() *sql.DB {
 		port     = 5432
 		user     = "postgres"
 		password = "12460"
-		dbname   = "frozen_food"
+		dbname   = "frozen_food_v3"
 	)
 	
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)

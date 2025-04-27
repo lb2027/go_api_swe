@@ -15,6 +15,7 @@ import (
 // @name token
 
 func main() {
+
 	mux := http.NewServeMux()
 
 	mux.Handle("/swagger/", httpSwagger.WrapHandler)
@@ -36,7 +37,6 @@ func main() {
 	mux.Handle("/updateproduk", database.MiddleWare(database.Api_updateProduk))
 	mux.Handle("/selectProdukById", database.MiddleWare(database.Api_selectProdukById))
 
-
 	// Transaksi
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
 	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
@@ -50,6 +50,8 @@ func main() {
 
 	handler := c.Handler(mux)
 
+
 	// Start the server
+	print("Server running on port 5050")
 	http.ListenAndServe(":5050", handler)
 }
