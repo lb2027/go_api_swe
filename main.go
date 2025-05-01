@@ -36,16 +36,19 @@ func main() {
 	mux.Handle("/deleteproduk", database.MiddleWare(database.Api_deleteProduk))
 	mux.Handle("/updateproduk", database.MiddleWare(database.Api_updateProduk))
 	mux.Handle("/selectProdukById", database.MiddleWare(database.Api_selectProdukById))
+	mux.Handle(("/soldproduk"), database.MiddleWare(database.Api_soldProduk))
 
 	// Transaksi
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
 	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
+	mux.Handle("/displayhistory", database.MiddleWare(database.GetTransactionHistory))
+
 
 	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders: []string{"Content-Type", "token"},
+		AllowedHeaders: []string{"Content-Type", "token", "Authorization"},
 	})
 
 	handler := c.Handler(mux)

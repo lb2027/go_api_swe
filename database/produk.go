@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
@@ -20,8 +22,10 @@ type Produk struct {
 }
 
 type SoldItem struct {
-	ProdukID   int `json:"produk_id"`
-	StokKeluar int `json:"stok_keluar"`
+	ProdukID   int     `json:"produk_id"`
+	NamaProduk string  `json:"nama_produk"`
+	Harga      float64 `json:"harga"`
+	StokKeluar int     `json:"stok_keluar"`
 }
 
 func select_allProduk() []Produk {
@@ -110,7 +114,7 @@ func updateDataProduk(id int, nama string, stok int, harga float64, harga_beli f
 		panic(err.Error())
 	}
 
-	// Insert a record into the stok table
+	// Insert a record into the stok_masuk table
 	_, err = tx.Exec("INSERT INTO stok_masuk (produk_id, jumlah) VALUES ($1, $2)", id, stockDifference)
 	if err != nil {
 		tx.Rollback()
@@ -134,7 +138,7 @@ func deleteDataProduk(id string) {
 	}
 }
 
-func updateStock(productID int, quantitySold int) error {
+func updateStockAndRecordSale(productID int, quantitySold int) error {
 	db := Koneksi()
 	defer db.Close()
 
@@ -145,23 +149,87 @@ func updateStock(productID int, quantitySold int) error {
 	}
 
 	// Update the produk table
-	_, err = tx.Exec("UPDATE produk SET stok = stok - $1 WHERE produk_id = $2", quantitySold, productID)
+	result, err := tx.Exec("UPDATE produk SET stok = stok - $1 WHERE produk_id = $2 AND stok >= $1", quantitySold, productID) // Add check to prevent negative stock
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	// Insert a record into the stok table
-	_, err = tx.Exec("INSERT INTO stok (produk_id, jumlah) VALUES ($1, $2)", productID, quantitySold)
+	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		tx.Rollback()
 		return err
+	}
+
+	if rowsAffected == 0 {
+		tx.Rollback()
+		return fmt.Errorf("no rows updated, either product ID %d not found or not enough stock", productID)
+	}
+
+	// Insert a record into the stok_keluar table
+	currentTime := time.Now()
+	_, err = tx.Exec("INSERT INTO stok_keluar (produk_id, jumlah, tanggal) VALUES ($1, $2, $3)", productID, quantitySold, currentTime)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Get product details
+	var namaProduk string
+	var harga float64
+	err = tx.QueryRow("SELECT nama, harga FROM produk WHERE produk_id = $1", productID).Scan(&namaProduk, &harga)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Calculate total harga
+	totalHarga := harga * float64(quantitySold)
+
+	// Insert a record into the transaksi table
+	_, err = tx.Exec("INSERT INTO transaksi (nama_produk, harga, jumlah_terjual, total_harga, tanggal) VALUES ($1, $2, $3, $4, $5)", namaProduk, harga, quantitySold, totalHarga, time.Now())
+	if err != nil {
+		fmt.Printf("Error inserting into transaksi table: %v\n", err)
+		tx.Rollback()
+		return fmt.Errorf("failed to insert into transaksi table: %w", err) // Wrap the error
+	}
+
+	// Insert into transaksi_header and get the transaksi_id
+	var transaksiID int
+	err = tx.QueryRow(
+		"INSERT INTO transaksi_header (transaksi_id, total_item, total_jumlah, tanggal_transaksi) VALUES (nextval('transaksi_transaksi_id_seq'), $1, $2, $3) RETURNING transaksi_id",
+		quantitySold,
+		pq.Array([]float64{totalHarga}), // Wrap totalHarga in an array
+		time.Now(),
+	).Scan(&transaksiID)
+	if err != nil {
+		fmt.Printf("Error inserting into transaksi_header table: %v\n", err)
+		tx.Rollback()
+		return fmt.Errorf("failed to insert into transaksi_header table: %w", err)
+	}
+
+	// Insert into transaksi_detail
+	_, err = tx.Exec(
+		"INSERT INTO transaksi_detail (transaksi_id, nama_produk, harga, jumlah_terjual, total_harga, total_items, total_amount, transaction_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+		transaksiID,          // Foreign key from transaksi_header
+		namaProduk,           // Product name
+		harga,                // Product price
+		quantitySold,         // Quantity sold
+		totalHarga,           // Total price for this product
+		quantitySold,         // Total items (same as quantitySold in this case)
+		totalHarga,           // Total amount (same as totalHarga in this case)
+		time.Now(),           // Transaction date
+	)
+	if err != nil {
+		fmt.Printf("Error inserting into transaksi_detail table: %v\n", err)
+		tx.Rollback()
+		return fmt.Errorf("failed to insert into transaksi_detail table: %w", err)
 	}
 
 	// Commit the transaction
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil
@@ -171,20 +239,39 @@ func Api_addSoldItems(w http.ResponseWriter, r *http.Request) {
 	var soldItems []SoldItem
 	err := json.NewDecoder(r.Body).Decode(&soldItems)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Error decoding JSON: " + err.Error()}) // Include the error message
 		return
 	}
 
 	for _, item := range soldItems {
-		err := updateStock(item.ProdukID, item.StokKeluar)
+		err := updateStockAndRecordSale(item.ProdukID, item.StokKeluar)
 		if err != nil {
-			http.Error(w, "Failed to update stock: "+err.Error(), http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to update stock and record sale: " + err.Error()}) // Include the error message
 			return
 		}
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Sold items added successfully")
+	json.NewEncoder(w).Encode(map[string]string{"message": "Sold items processed successfully"})
+}
+
+// @Summary Endpoint to handle sold products
+// @Description Decreases stock in 'produk' table and records sale in 'stok_keluar' table
+// @Tags Produk
+// @Accept json
+// @Produce json
+// @Param soldItems body []SoldItem true "List of sold items"
+// @Success 200 {string} string "Sold items processed successfully"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /soldproduk [post]
+func Api_soldProduk(w http.ResponseWriter, r *http.Request) {
+	Api_addSoldItems(w, r)
 }
 
 // @Summary Ambil produk berdasarkan ID
@@ -318,6 +405,67 @@ func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
-// pgsql query to rename transaksi table to stok
+func GetTransactionHistory(w http.ResponseWriter, r *http.Request) {
+	db := Koneksi()
+	defer db.Close()
 
-// DELETE FROM produk WHERE produk_id = $1
+	// SQL query to fetch transaction history
+	sqlQuery := `
+		SELECT 
+            td.transaksi_id, 
+            td.nama_produk, 
+            td.harga AS harga_jual, 
+            p.harga_beli, 
+            td.jumlah_terjual, 
+            td.total_harga, 
+            th.tanggal_transaksi
+        FROM transaksi_detail td
+        INNER JOIN produk p ON td.nama_produk = p.nama
+        INNER JOIN transaksi_header th ON td.transaksi_id = th.transaksi_id
+        ORDER BY td.transaksi_id DESC
+    `
+
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		http.Error(w, "Failed to fetch transaction history: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var transactions []map[string]interface{}
+	for rows.Next() {
+		var transactionID string
+		var namaProduk string
+		var hargaJual float64
+		var hargaBeli float64
+		var jumlahTerjual int
+		var totalHarga float64
+		var tanggalTransaksi time.Time
+
+		err := rows.Scan(&transactionID, &namaProduk, &hargaJual, &hargaBeli, &jumlahTerjual, &totalHarga, &tanggalTransaksi)
+		if err != nil {
+			http.Error(w, "Failed to scan transaction row: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		transaction := map[string]interface{}{
+			"transaksi_id":      transactionID,
+			"nama_produk":       namaProduk,
+			"harga_jual":        hargaJual,
+			"harga_beli":        hargaBeli,
+			"jumlah_terjual":    jumlahTerjual,
+			"total_harga":       totalHarga,
+			"tanggal_transaksi": tanggalTransaksi,
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Error iterating through rows: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(transactions)
+}
+
