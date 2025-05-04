@@ -42,7 +42,8 @@ func main() {
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
 	mux.Handle("/addtransaksi", database.MiddleWare(database.Api_addTransaksi))
 	mux.Handle("/displayhistory", database.MiddleWare(database.GetTransactionHistory))
-
+	mux.Handle("/dailysales", database.MiddleWare(database.GetDailySales))
+	mux.Handle("/weeklysales", database.MiddleWare(database.GetWeeklySales))
 
 	// CORS setup
 	c := cors.New(cors.Options{
