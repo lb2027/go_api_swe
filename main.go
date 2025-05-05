@@ -19,8 +19,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/swagger/", httpSwagger.WrapHandler)
-	// Public routes (no authentication required)
-	mux.HandleFunc("/login", database.API_generateJWT) // Changed from /jwt to /login
+	mux.HandleFunc("/login", database.API_generateJWT) 
 	mux.HandleFunc("/register", database.API_register)
 
 	// Protected routes (pakai middleware JWT)
