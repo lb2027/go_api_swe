@@ -16,6 +16,7 @@ type Staff struct {
 	Email       string `json:"email"`
 	StatusKerja string `json:"status_kerja"`
 	User_id     int    `json:"user_id"`
+	Tanggal_lahir string `json:"tanggal_lahir"` // Added field for DOB
 }
 
 // @Summary Make me staff
@@ -80,7 +81,7 @@ func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get all staff
-	rows, err := db.Query("SELECT id, nama, no_hp, alamat, email, status_kerja, user_id FROM staff ORDER BY nama")
+	rows, err := db.Query("SELECT id, nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir FROM staff ORDER BY nama")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,9 +93,9 @@ func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var staff Staff
 		var userID *int // Nullable field
-		var email, alamat *string // Nullable fields
+		var email, alamat, dateOfBirth *string // Nullable fields
 
-		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID)
+		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -109,6 +110,9 @@ func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 		}
 		if alamat != nil {
 			staff.Alamat = *alamat
+		}
+		if dateOfBirth != nil {
+			staff.Tanggal_lahir = *dateOfBirth
 		}
 
 		staffs = append(staffs, staff)
@@ -155,13 +159,13 @@ func Api_getStaffByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get staff by ID
-	row := db.QueryRow("SELECT id, nama, no_hp, alamat, email, status_kerja, user_id FROM staff WHERE id = $1", id)
+	row := db.QueryRow("SELECT id, nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir FROM staff WHERE id = $1", id)
 
 	var staff Staff
 	var userID *int // Nullable field
-	var email, alamat *string // Nullable fields
+	var email, alamat, dateOfBirth *string // Nullable fields
 
-	err = row.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID)
+	err = row.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
 	if err != nil {
 		http.Error(w, "Staff not found", http.StatusNotFound)
 		return
@@ -176,6 +180,9 @@ func Api_getStaffByID(w http.ResponseWriter, r *http.Request) {
 	}
 	if alamat != nil {
 		staff.Alamat = *alamat
+	}
+	if dateOfBirth != nil {
+		staff.Tanggal_lahir = *dateOfBirth
 	}
 
 	// Return the staff as JSON
@@ -221,14 +228,36 @@ func Api_addStaff(w http.ResponseWriter, r *http.Request) {
 
 	// Insert new staff and return the ID (PostgreSQL way with RETURNING clause)
 	var staffID int
+	var query string
+	var args []interface{}
+
 	if staff.User_id > 0 {
-		err = db.QueryRow("INSERT INTO staff (nama, no_hp, alamat, email, status_kerja, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-			staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.User_id).Scan(&staffID)
+		if staff.Tanggal_lahir != "" {
+			query = `INSERT INTO staff (nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir) 
+					VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+			args = []interface{}{staff.Username, staff.NomorHP, staff.Alamat, staff.Email,
+				staff.StatusKerja, staff.User_id, staff.Tanggal_lahir}
+		} else {
+			query = `INSERT INTO staff (nama, no_hp, alamat, email, status_kerja, user_id) 
+					VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+			args = []interface{}{staff.Username, staff.NomorHP, staff.Alamat, staff.Email,
+				staff.StatusKerja, staff.User_id}
+		}
 	} else {
-		err = db.QueryRow("INSERT INTO staff (nama, no_hp, alamat, email, status_kerja) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-			staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja).Scan(&staffID)
+		if staff.Tanggal_lahir != "" {
+			query = `INSERT INTO staff (nama, no_hp, alamat, email, status_kerja, tanggal_lahir) 
+					VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+			args = []interface{}{staff.Username, staff.NomorHP, staff.Alamat, staff.Email,
+				staff.StatusKerja, staff.Tanggal_lahir}
+		} else {
+			query = `INSERT INTO staff (nama, no_hp, alamat, email, status_kerja) 
+					VALUES ($1, $2, $3, $4, $5) RETURNING id`
+			args = []interface{}{staff.Username, staff.NomorHP, staff.Alamat, staff.Email,
+				staff.StatusKerja}
+		}
 	}
 
+	err = db.QueryRow(query, args...).Scan(&staffID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -295,14 +324,25 @@ func Api_updateStaff(w http.ResponseWriter, r *http.Request) {
 	// Update staff - Fixed for PostgreSQL syntax
 	var result sql.Result
 	if staff.User_id > 0 {
-		result, err = db.Exec(
-			"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = $6 WHERE id = $7",
-			staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.User_id, staff.Staff_id)
+		if staff.Tanggal_lahir != "" {
+			result, err = db.Exec(
+				"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = $6, tanggal_lahir = $7 WHERE id = $8",
+				staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.User_id, staff.Tanggal_lahir, staff.Staff_id)
+		} else {
+			result, err = db.Exec(
+				"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = $6, tanggal_lahir = NULL WHERE id = $7",
+				staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.User_id, staff.Staff_id)
+		}
 	} else {
-		// Handle null user_id
-		result, err = db.Exec(
-			"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = NULL WHERE id = $6",
-			staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.Staff_id)
+		if staff.Tanggal_lahir != "" {
+			result, err = db.Exec(
+				"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = NULL, tanggal_lahir = $6 WHERE id = $7",
+				staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.Tanggal_lahir, staff.Staff_id)
+		} else {
+			result, err = db.Exec(
+				"UPDATE staff SET nama = $1, no_hp = $2, alamat = $3, email = $4, status_kerja = $5, user_id = NULL, tanggal_lahir = NULL WHERE id = $6",
+				staff.Username, staff.NomorHP, staff.Alamat, staff.Email, staff.StatusKerja, staff.Staff_id)
+		}
 	}
 
 	if err != nil {
@@ -599,7 +639,7 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 
 	// Search staff by name, email, phone, or status - Fixed for PostgreSQL
 	rows, err := db.Query(`
-        SELECT id, nama, no_hp, alamat, email, status_kerja, user_id 
+        SELECT id, nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir 
         FROM staff 
         WHERE nama ILIKE $1 OR email ILIKE $2 OR no_hp ILIKE $3 OR status_kerja ILIKE $4 
         ORDER BY nama
@@ -616,9 +656,9 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var staff Staff
 		var userID *int // Nullable field
-		var email, alamat *string // Nullable fields
+		var email, alamat, dateOfBirth *string // Nullable fields
 
-		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID)
+		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -633,6 +673,9 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 		}
 		if alamat != nil {
 			staff.Alamat = *alamat
+		}
+		if dateOfBirth != nil {
+			staff.Tanggal_lahir = *dateOfBirth
 		}
 
 		staffs = append(staffs, staff)
