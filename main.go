@@ -59,7 +59,7 @@ func main() {
 	mux.Handle("/staffstats", database.MiddleWare(database.Api_getStaffStats))
 	mux.Handle("/makemestaff", database.MiddleWare(database.Api_getStaff))
 
-	// haruse keluar lo
+	// haruse keluar lo ini
 	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
