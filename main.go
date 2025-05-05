@@ -36,7 +36,7 @@ func main() {
 	mux.Handle("/deleteproduk", database.MiddleWare(database.Api_deleteProduk))
 	mux.Handle("/updateproduk", database.MiddleWare(database.Api_updateProduk))
 	mux.Handle("/selectProdukById", database.MiddleWare(database.Api_selectProdukById))
-	mux.Handle(("/soldproduk"), database.MiddleWare(database.Api_soldProduk))
+	mux.Handle("/soldproduk", database.MiddleWare(database.Api_soldProduk))
 
 	// Transaksi
 	mux.Handle("/selecttransaksi", database.MiddleWare(database.Api_selectAllTransaksi))
@@ -44,16 +44,30 @@ func main() {
 	mux.Handle("/displayhistory", database.MiddleWare(database.GetTransactionHistory))
 	mux.Handle("/dailysales", database.MiddleWare(database.GetDailySales))
 	mux.Handle("/weeklysales", database.MiddleWare(database.GetWeeklySales))
+	mux.Handle("/monthlysales", database.MiddleWare(database.GetMonthlyRevenue))
+	mux.Handle("/inventorystatus", database.MiddleWare(database.GetInventoryStatus))
+
+	// Staff
+	// Staff management endpoints
+	mux.Handle("/staff", database.MiddleWare(database.Api_getAllStaff))
+	mux.Handle("/staff/", database.MiddleWare(database.Api_getStaffByID))
+	mux.Handle("/addstaff", database.MiddleWare(database.Api_addStaff))
+	mux.Handle("/updatestaff", database.MiddleWare(database.Api_updateStaff))
+	mux.Handle("/deletestaff", database.MiddleWare(database.Api_deleteStaff))
+	mux.Handle("/bulkdeletestaff", database.MiddleWare(database.Api_bulkDeleteStaff))
+	mux.Handle("/bulkupdatestaffstatus", database.MiddleWare(database.Api_bulkUpdateStaffStatus))
+	mux.Handle("/searchstaff", database.MiddleWare(database.Api_searchStaff))
+	mux.Handle("/staffstats", database.MiddleWare(database.Api_getStaffStats))
+	mux.Handle("/makemestaff", database.MiddleWare(database.Api_getStaff))
 
 	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Content-Type", "token", "Authorization"},
 	})
 
 	handler := c.Handler(mux)
-
 
 	// Start the server
 	print("Server running on port 5050")

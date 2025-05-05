@@ -222,102 +222,110 @@ func updateStockAndRecordSale(productID int, quantitySold int, transaksiID int) 
 }
 
 func Api_addSoldItems(w http.ResponseWriter, r *http.Request) {
-	db := Koneksi()
-	defer db.Close()
+    db := Koneksi()
+    defer db.Close()
 
-	var soldItems []SoldItem
-	err := json.NewDecoder(r.Body).Decode(&soldItems)
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Error decoding JSON: " + err.Error()}) // Include the error message
-		return
-	}
+    var soldItems []SoldItem
+    err := json.NewDecoder(r.Body).Decode(&soldItems)
+    if err != nil {
+        fmt.Println("Error decoding JSON:", err) // Add this line
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Error decoding JSON: " + err.Error()}) // Include the error message
+        return
+    }
 
-	// Validate that we have items to process
-	if len(soldItems) == 0 {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "No items to process"})
-		return
-	}
+    // Validate that we have items to process
+    if len(soldItems) == 0 {
+        fmt.Println("No items to process") // Add this line
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(map[string]string{"error": "No items to process"})
+        return
+    }
 
-	// Start a transaction for creating the header
-	tx, err := db.Begin()
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to start transaction: " + err.Error()})
-		return
-	}
+    // Start a transaction for creating the header
+    tx, err := db.Begin()
+    if err != nil {
+        fmt.Println("Failed to start transaction:", err) // Add this line
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Failed to start transaction: " + err.Error()})
+        return
+    }
 
-	// Calculate total items and total amount for all products
-	totalItems := 0
-	var totalAmounts []float64
-	var totalAmount float64
+    // Calculate total items and total amount for all products
+    totalItems := 0
+    var totalAmounts []float64
+    var totalAmount float64
 
-	// First pass: collect information about all products
-	for _, item := range soldItems {
-		// Get product details to calculate total price
-		var namaProduk string
-		var harga float64
-		err := db.QueryRow("SELECT nama, harga FROM produk WHERE produk_id = $1", item.ProdukID).Scan(&namaProduk, &harga)
-		if err != nil {
-			tx.Rollback()
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to get product details: " + err.Error()})
-			return
-		}
+    // First pass: collect information about all products
+    for _, item := range soldItems {
+        // Get product details to calculate total price
+        var namaProduk string
+        var harga float64
+        fmt.Println("Item:", item) // Add this line
+        err := db.QueryRow("SELECT nama, harga FROM produk WHERE produk_id = $1", item.ProdukID).Scan(&namaProduk, &harga)
+        if err != nil {
+            fmt.Println("Failed to get product details:", err) // Add this line
+            tx.Rollback()
+            w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]string{"error": "Failed to get product details: " + err.Error()})
+            return
+        }
 
-		itemTotal := harga * float64(item.StokKeluar)
-		totalItems += item.StokKeluar
-		totalAmounts = append(totalAmounts, itemTotal)
-		totalAmount += itemTotal
-	}
+        itemTotal := harga * float64(item.StokKeluar)
+        totalItems += item.StokKeluar
+        totalAmounts = append(totalAmounts, itemTotal)
+        totalAmount += itemTotal
+    }
 
-	// Create a single transaksi_header entry for all items
-	var transaksiID int
-	err = tx.QueryRow(
-		"INSERT INTO transaksi_header (total_item, total_jumlah, tanggal_transaksi) VALUES ($1, $2, $3) RETURNING transaksi_id",
-		totalItems,
-		pq.Array(totalAmounts), // All individual item totals
-		time.Now(),
-	).Scan(&transaksiID)
-	if err != nil {
-		tx.Rollback()
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to create transaction header: " + err.Error()})
-		return
-	}
+    // Create a single transaksi_header entry for all items
+    var transaksiID int
+    err = tx.QueryRow(
+        "INSERT INTO transaksi_header (total_item, total_jumlah, tanggal_transaksi) VALUES ($1, $2, $3) RETURNING transaksi_id",
+        totalItems,
+        pq.Array(totalAmounts), // All individual item totals
+        time.Now(),
+    ).Scan(&transaksiID)
+    if err != nil {
+        fmt.Println("Failed to create transaction header:", err) // Add this line
+        tx.Rollback()
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Failed to create transaction header: " + err.Error()})
+        return
+    }
 
-	// Commit the transaction header
-	err = tx.Commit()
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to commit transaction header: " + err.Error()})
-		return
-	}
+    // Commit the transaction header
+    err = tx.Commit()
+    if err != nil {
+        fmt.Println("Failed to commit transaction header:", err) // Add this line
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Failed to commit transaction header: " + err.Error()})
+        return
+    }
 
-	// Now process each item with the same transaction ID
-	for _, item := range soldItems {
-		err := updateStockAndRecordSale(item.ProdukID, item.StokKeluar, transaksiID)
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to update stock and record sale: " + err.Error()})
-			return
-		}
-	}
+    // Now process each item with the same transaction ID
+    for _, item := range soldItems {
+        err := updateStockAndRecordSale(item.ProdukID, item.StokKeluar, transaksiID)
+        if err != nil {
+            fmt.Println("Failed to update stock and record sale:", err) // Add this line
+            w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]string{"error": "Failed to update stock and record sale: " + err.Error()})
+            return
+        }
+    }
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Sold items processed successfully", 
-		"transaction_id": fmt.Sprintf("%d", transaksiID),
-	})
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]string{
+        "message": "Sold items processed successfully",
+        "transaction_id": fmt.Sprintf("%d", transaksiID),
+    })
 }
 
 // @Summary Endpoint to handle sold products
@@ -637,5 +645,73 @@ func GetWeeklySales(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(sales)
+}
+
+func GetMonthlyRevenue(w http.ResponseWriter, r *http.Request) {
+    db := Koneksi()
+    defer db.Close()
+
+    // Get the current year and month
+    now := time.Now()
+    year, month, _ := now.Date()
+
+    // Calculate the start and end dates of the month
+    firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+    lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+    // SQL query to calculate total revenue for the current month
+    sqlQuery := `
+        SELECT SUM(total_harga)
+        FROM transaksi
+        WHERE tanggal >= $1 AND tanggal <= $2
+    `
+
+    var totalRevenue float64
+    err := db.QueryRow(sqlQuery, firstOfMonth, lastOfMonth).Scan(&totalRevenue)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            // If there are no sales for the month, return 0
+            totalRevenue = 0
+        } else {
+            http.Error(w, "Failed to fetch monthly revenue: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    // Create a map to hold the result
+    result := map[string]interface{}{
+        "month":       month.String(),
+        "year":        year,
+        "totalRevenue": totalRevenue,
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(result)
+}
+
+func GetInventoryStatus(w http.ResponseWriter, r *http.Request) {
+    db := Koneksi()
+    defer db.Close()
+
+    // SQL query to count the total number of products
+    sqlQuery := `
+        SELECT COUNT(*)
+        FROM produk
+    `
+
+    var totalProducts int
+    err := db.QueryRow(sqlQuery).Scan(&totalProducts)
+    if err != nil {
+        http.Error(w, "Failed to fetch inventory status: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Create a map to hold the result
+    result := map[string]interface{}{
+        "totalProducts": totalProducts,
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(result)
 }
 
