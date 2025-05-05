@@ -19,7 +19,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/swagger/", httpSwagger.WrapHandler)
-	mux.HandleFunc("/login", database.API_generateJWT) 
+	mux.HandleFunc("/login", database.API_generateJWT)
 	mux.HandleFunc("/register", database.API_register)
 
 	// Protected routes (pakai middleware JWT)
