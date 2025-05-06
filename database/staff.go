@@ -9,13 +9,13 @@ import (
 )
 
 type Staff struct {
-	Staff_id    int    `json:"id"`
-	Username    string `json:"nama"`
-	NomorHP     string `json:"no_hp"`
-	Alamat      string `json:"alamat"`
-	Email       string `json:"email"`
-	StatusKerja string `json:"status_kerja"`
-	User_id     int    `json:"user_id"`
+	Staff_id    int    	`json:"id"`
+	Username    string 	`json:"nama"`
+	NomorHP     string 	`json:"no_hp"`
+	Alamat      string 	`json:"alamat"`
+	Email       string 	`json:"email"`
+	StatusKerja string 	`json:"status_kerja"`
+	User_id     int    	`json:"user_id"`
 	Tanggal_lahir string `json:"tanggal_lahir"` // Added field for DOB
 }
 
