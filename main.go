@@ -46,7 +46,9 @@ func main() {
 	mux.Handle("/monthlysales", database.MiddleWare(database.GetMonthlyRevenue))
 	mux.Handle("/inventorystatus", database.MiddleWare(database.GetInventoryStatus))
 
-	// Staff
+	// Absensi
+	mux.Handle("/addabsensi", database.MiddleWare(database.Api_addAbsensi)) // POST
+
 	// Staff management endpoints
 	mux.Handle("/staff", database.MiddleWare(database.Api_getAllStaff))
 	mux.Handle("/staff/", database.MiddleWare(database.Api_getStaffByID))

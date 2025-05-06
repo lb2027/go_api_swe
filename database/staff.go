@@ -9,13 +9,13 @@ import (
 )
 
 type Staff struct {
-	Staff_id    int    `json:"id"`
-	Username    string `json:"nama"`
-	NomorHP     string `json:"no_hp"`
-	Alamat      string `json:"alamat"`
-	Email       string `json:"email"`
-	StatusKerja string `json:"status_kerja"`
-	User_id     int    `json:"user_id"`
+	Staff_id      int    `json:"id"`
+	Username      string `json:"nama"`
+	NomorHP       string `json:"no_hp"`
+	Alamat        string `json:"alamat"`
+	Email         string `json:"email"`
+	StatusKerja   string `json:"status_kerja"`
+	User_id       int    `json:"user_id"`
 	Tanggal_lahir string `json:"tanggal_lahir"` // Added field for DOB
 }
 
@@ -92,7 +92,7 @@ func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 	var staffs []Staff
 	for rows.Next() {
 		var staff Staff
-		var userID *int // Nullable field
+		var userID *int                        // Nullable field
 		var email, alamat, dateOfBirth *string // Nullable fields
 
 		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
@@ -162,7 +162,7 @@ func Api_getStaffByID(w http.ResponseWriter, r *http.Request) {
 	row := db.QueryRow("SELECT id, nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir FROM staff WHERE id = $1", id)
 
 	var staff Staff
-	var userID *int // Nullable field
+	var userID *int                        // Nullable field
 	var email, alamat, dateOfBirth *string // Nullable fields
 
 	err = row.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
@@ -655,7 +655,7 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 	var staffs []Staff
 	for rows.Next() {
 		var staff Staff
-		var userID *int // Nullable field
+		var userID *int                        // Nullable field
 		var email, alamat, dateOfBirth *string // Nullable fields
 
 		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
@@ -752,4 +752,50 @@ func isValidToken(token string) bool {
 	// In a real application, you would validate the token
 	// For simplicity, we're just checking if it's not empty
 	return true
+}
+
+// @Summary Get staff statistics
+// @Description Get absensi Staff
+// @Tags Staff
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /staffstats [get]
+func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
+	db := Koneksi()
+	defer db.Close()
+	enableCors(&w)
+
+	// Check token
+	token := r.Header.Get("token")
+	if !isValidToken(token) {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var data struct {
+		Latitude  string `json:"latitude"`
+		Longitude string `json:"longitude"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("INSERT INTO absensi (latitude, longitude) VALUES ($1, $2)", data.Latitude, data.Longitude)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Absensi berhasil ditambahkan"})
 }
