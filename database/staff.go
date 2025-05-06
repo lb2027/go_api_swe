@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -763,11 +764,11 @@ func isValidToken(token string) bool {
 // @Failure 500 {object} map[string]string
 // @Router /staffstats [get]
 func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
-	db := Koneksi()
+	db := Koneksi() // Koneksi ke database
 	defer db.Close()
 	enableCors(&w)
 
-	// Check token
+	// Cek token
 	token := r.Header.Get("token")
 	if !isValidToken(token) {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
@@ -778,24 +779,39 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Struktur data yang diterima dari request
 	var data struct {
-		Latitude  string `json:"latitude"`
-		Longitude string `json:"longitude"`
+		StaffID    int    `json:"staff_id"`
+		Tanggal    string `json:"tanggal"`
+		JamMasuk   string `json:"jam_masuk"`
+		Status     string `json:"status"`
+		Keterangan string `json:"keterangan"`
+		// Latitude   float64 `json:"latitude"`
+		// Longitude  float64 `json:"longitude"`
+		// // Timestamp  string  `json:"timestamp"` // HAPUS atau KOMEN saja
 	}
 
+	// Dekode data JSON dari body request
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO absensi (latitude, longitude) VALUES ($1, $2)", data.Latitude, data.Longitude)
+	// Query untuk insert data absensi
+	_, err = db.Exec(`
+		INSERT INTO absensi (staff_id, tanggal, jam_masuk, status, keterangan )
+	VALUES ($1, $2, $3, $4, $5)`,
+		data.StaffID, data.Tanggal, data.JamMasuk, data.Status, data.Keterangan)
+
 	if err != nil {
+		log.Println("Insert error:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Respon sukses
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Absensi berhasil ditambahkan"})
+	json.NewEncoder(w).Encode(map[string]string{"success": "true", "message": "Absensi berhasil ditambahkan"})
 }

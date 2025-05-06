@@ -10,11 +10,12 @@ import (
 )
 
 type User struct {
-	User_id      int    `json:"id"`
-	Username    string `json:"username"`
-	Password   	string `json:"password"`
-	Role 		string `json:"role"`
+	User_id  int    `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
+
 // Api_selectAllData godoc
 // @Summary Get all user
 // @Description Get list of all user from database
@@ -67,7 +68,6 @@ func Select_alluser() []User {
 //     return userArray
 // }
 
-
 // func getUserByname(name string) []User {
 //     db := Koneksi()
 //     var user = User{}
@@ -113,15 +113,15 @@ func Select_alluser() []User {
 // }
 
 func addData(username string, password string, role string) {
-    db := Koneksi()
-    sttmnt, err := db.Prepare("INSERT INTO users(username, password, role) VALUES($1, $2, $3)")
-    if err != nil {
-        panic(err.Error())
-    }
-    _, err = sttmnt.Exec(username, password, role)
-    if err != nil {
-        panic(err.Error())
-    }
+	db := Koneksi()
+	sttmnt, err := db.Prepare("INSERT INTO users(username, password, role) VALUES($1, $2, $3)")
+	if err != nil {
+		panic(err.Error())
+	}
+	_, err = sttmnt.Exec(username, password, role)
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 // func deleteUserById(id string) {
@@ -134,26 +134,25 @@ func addData(username string, password string, role string) {
 // 	}
 // }
 
-
 // connect
 func Koneksi() *sql.DB {
 	const (
 		host     = "localhost"
 		port     = 5432
 		user     = "postgres"
-		password = "12460"
+		password = "12345678"
 		dbname   = "frozen_food_v3"
 	)
-	
+
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := sql.Open("postgres", psqlconn)
 
-    if err != nil {
-        panic(err.Error())
-    } else {
-        fmt.Println("connected")
-        return db
-    }
+	if err != nil {
+		panic(err.Error())
+	} else {
+		fmt.Println("connected")
+		return db
+	}
 }
 
 // @Summary Menambahkan user baru
@@ -168,10 +167,10 @@ func Koneksi() *sql.DB {
 func API_add(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	addData(user.Username, user.Password, user.Role)
 	w.WriteHeader(http.StatusCreated)
@@ -254,30 +253,30 @@ func Api_selectAllData(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} map[string]string
 // @Router /deleteuser [delete]
 func Api_deleteUser(w http.ResponseWriter, r *http.Request) {
-    var user User
-    err := json.NewDecoder(r.Body).Decode(&user)
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
 
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    if user.User_id == 0 {
-        http.Error(w, "no id found", http.StatusBadRequest)
-        return
-    }
+	if user.User_id == 0 {
+		http.Error(w, "no id found", http.StatusBadRequest)
+		return
+	}
 
-    db := Koneksi()
-    statement, err := db.Prepare("DELETE FROM users WHERE user_id = $1")
-    if err != nil {
-        panic(err.Error())
-    } else {
-        _, err = statement.Exec(user.User_id)
-        if err != nil {
-            panic(err.Error())
-        }
-    }
-    w.WriteHeader(http.StatusNoContent)
+	db := Koneksi()
+	statement, err := db.Prepare("DELETE FROM users WHERE user_id = $1")
+	if err != nil {
+		panic(err.Error())
+	} else {
+		_, err = statement.Exec(user.User_id)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // @Summary Update user
@@ -317,7 +316,7 @@ func Api_updateUser(w http.ResponseWriter, r *http.Request) {
 
 // func Api_getNameAddress(w http.ResponseWriter, r *http.Request) {
 // 	address := r.URL.Query().Get("address")
-// 	if address == "" {	
+// 	if address == "" {
 // 		http.Error(w, "no id found", http.StatusBadRequest)
 // 		return
 // 	}
