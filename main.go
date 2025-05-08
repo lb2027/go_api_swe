@@ -15,6 +15,7 @@ import (
 // @name token
 
 func main() {
+	database.CopyImagesToUploadsDir()
 
 	mux := http.NewServeMux()
 
@@ -70,7 +71,9 @@ func main() {
 	mux.Handle("/deletegaji", database.MiddleWare(database.Api_DeleteGaji)) // DELETE
 
 
-
+	// In your routes file
+	mux.Handle("/images/", database.MiddleWare(database.ServeProductImage))
+	mux.Handle("/uploadimage", database.MiddleWare(database.UploadProductImage))	
 	// haruse keluar lo ini
 	// CORS setup
 	c := cors.New(cors.Options{
