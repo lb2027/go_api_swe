@@ -1,17 +1,21 @@
 package database
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // Configuration for image serving
 const (
-    // Change this to match your actual image storage directory
-    ImageStorageDir = `D:\Coding File 2\frozen_food_v2\images`
+    // Use absolute path to your images directory
+    ImageStorageDir = "D:/FINAL PROJECT SEMESTER 4 FILES/go_api_swe/database/images"
     // Allowed image extensions to prevent serving arbitrary files
     AllowedExtensions = ".jpg,.jpeg,.png,.gif,.webp,.bmp"
 )
@@ -27,6 +31,94 @@ const (
 // @Failure 400 {string} string "Invalid filename or unsupported file type"
 // @Failure 500 {string} string "Error reading image file"
 // @Router /images/{filename} [get]
+func ServeProductImage(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("============= IMAGE REQUEST =============")
+    fmt.Println("Path:", r.URL.Path)
+    fmt.Println("Working Directory:", getWorkingDir())
+    fmt.Println("=========================================")
+    
+    log.Printf("Image request received for: %s", r.URL.Path)
+    enableCors(&w)
+
+    // Extract filename from path
+    // Expected path format: /images/filename.ext
+    parts := strings.Split(r.URL.Path, "/")
+    if len(parts) < 3 {
+        log.Printf("Invalid image path: %s", r.URL.Path)
+        http.Error(w, "Invalid image path", http.StatusBadRequest)
+        return
+    }
+    
+    filename := parts[len(parts)-1]
+    log.Printf("Requested filename: %s", filename)
+    
+    // Basic security check: validate filename
+    if filename == "" || strings.Contains(filename, "..") {
+        http.Error(w, "Invalid filename", http.StatusBadRequest)
+        return
+    }
+    
+    // Check file extension
+    ext := filepath.Ext(filename)
+    if ext == "" || !strings.Contains(AllowedExtensions, strings.ToLower(ext)) {
+        http.Error(w, "Unsupported file type", http.StatusBadRequest)
+        return
+    }
+    
+    // Construct the full path to the image file
+    imagePath := filepath.Join(ImageStorageDir, filename)
+    log.Printf("Looking for image at: %s", imagePath)
+    
+    // Check if the file exists
+    if _, err := os.Stat(imagePath); os.IsNotExist(err) {
+        log.Printf("Image not found at path: %s", imagePath)
+        log.Printf("Image not found: %s, serving placeholder", imagePath)
+        // Serve placeholder instead
+        placeholderPath := filepath.Join(ImageStorageDir, "placeholder.png")
+        if _, err := os.Stat(placeholderPath); os.IsNotExist(err) {
+            // If placeholder doesn't exist, serve a 404 error
+            http.Error(w, "Image not found", http.StatusNotFound)
+            return
+        }
+        http.ServeFile(w, r, placeholderPath)
+        return
+    } else {
+        log.Printf("Image found at path: %s", imagePath)
+    }
+    
+    // Determine content type based on file extension
+    var contentType string
+    switch strings.ToLower(ext) {
+    case ".jpg", ".jpeg":
+        contentType = "image/jpeg"
+    case ".png":
+        contentType = "image/png"
+    case ".gif":
+        contentType = "image/gif"
+    case ".webp":
+        contentType = "image/webp"
+    case ".bmp":
+        contentType = "image/bmp"
+    default:
+        contentType = "application/octet-stream"
+    }
+    
+    // Set appropriate headers
+    w.Header().Set("Content-Type", contentType)
+    w.Header().Set("Cache-Control", "public, max-age=31536000") // Cache for 1 year
+    
+    // Serve the file
+    http.ServeFile(w, r, imagePath)
+}
+
+// Add this helper function
+func getWorkingDir() string {
+    dir, err := os.Getwd()
+    if err != nil {
+        return "Error getting working directory"
+    }
+    return dir
+}
 
 // @Summary Upload product image
 // @Description Upload a new product image to the server
@@ -40,69 +132,87 @@ const (
 // @Failure 401 {object} map[string]string "Error: Invalid token"
 // @Failure 500 {object} map[string]string "Error: Failed to upload image"
 // @Router /uploadimage [post]
-
-
-// CopyImagesToUploadsDir copies images from a source directory to the uploads directory
-func CopyImagesToUploadsDir() {
-    sourceDir := "/images/"
-    // Check if source directory exists
-    if _, err := os.Stat(sourceDir); os.IsNotExist(err) {
-        log.Printf("Source directory does not exist: %s", sourceDir)
-        return
-    }
-    files, err := os.ReadDir(sourceDir)
-    if err != nil {
-        log.Printf("Error reading source directory: %v", err)
+func UploadProductImage(w http.ResponseWriter, r *http.Request) {
+    enableCors(&w)
+    
+    // Check token for authentication
+    token := r.Header.Get("token")
+    if !isValidToken(token) {
+        http.Error(w, "Invalid token", http.StatusUnauthorized)
         return
     }
     
-    // Create destination directory if it doesn't exist
+    // Check if request method is POST
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+    
+    // Parse the multipart form
+    err := r.ParseMultipartForm(10 << 20) // Max 10 MB
+    if err != nil {
+        http.Error(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
+        return
+    }
+    
+    // Get the file from form data
+    file, handler, err := r.FormFile("image")
+    if err != nil {
+        http.Error(w, "Failed to get file: "+err.Error(), http.StatusBadRequest)
+        return
+    }
+    defer file.Close()
+    
+    // Check file extension
+    ext := filepath.Ext(handler.Filename)
+    if ext == "" || !strings.Contains(AllowedExtensions, strings.ToLower(ext)) {
+        http.Error(w, "Unsupported file type. Allowed: "+AllowedExtensions, http.StatusBadRequest)
+        return
+    }
+    
+    // Create uploads directory if it doesn't exist
     if _, err := os.Stat(ImageStorageDir); os.IsNotExist(err) {
         err = os.MkdirAll(ImageStorageDir, 0755)
         if err != nil {
             log.Printf("Error creating directory: %v", err)
+            http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
             return
         }
     }
     
-    for _, file := range files {
-        if file.IsDir() {
-            continue
-        }
-        
-        ext := filepath.Ext(file.Name())
-        if ext == "" || !strings.Contains(AllowedExtensions, strings.ToLower(ext)) {
-            continue // Skip non-image files
-        }
-        
-        sourcePath := filepath.Join(sourceDir, file.Name())
-        destPath := filepath.Join(ImageStorageDir, file.Name())
-        
-        // Skip if file already exists in destination
-        if _, err := os.Stat(destPath); err == nil {
-            continue
-        }
-        
-        // Copy file
-        sourceFile, err := os.Open(sourcePath)
-        if err != nil {
-            log.Printf("Error opening source file %s: %v", file.Name(), err)
-            continue
-        }
-        defer sourceFile.Close()
-        
-        destFile, err := os.Create(destPath)
-        if err != nil {
-            log.Printf("Error creating destination file %s: %v", file.Name(), err)
-            continue
-        }
-        defer destFile.Close()
-        
-        _, err = io.Copy(destFile, sourceFile)
-        if err != nil {
-            log.Printf("Error copying file %s: %v", file.Name(), err)
-        }
+    // Generate unique filename to prevent overwriting existing files
+    // You could use UUID or timestamp-based filenames for production
+    filename := fmt.Sprintf("%d_%s", timeNow().Unix(), handler.Filename)
+    filepath := filepath.Join(ImageStorageDir, filename)
+    
+    // Create the file
+    dst, err := os.Create(filepath)
+    if err != nil {
+        log.Printf("Error creating file: %v", err)
+        http.Error(w, "Failed to save image: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer dst.Close()
+    
+    // Copy the uploaded file data to the newly created file
+    _, err = io.Copy(dst, file)
+    if err != nil {
+        log.Printf("Error copying file data: %v", err)
+        http.Error(w, "Failed to save image data: "+err.Error(), http.StatusInternalServerError)
+        return
     }
     
-    log.Printf("Image migration complete")
+    // Return success response with the filename
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{
+        "filename": filename,
+        "message": "Image uploaded successfully",
+    })
 }
+
+// timeNow is a function that returns the current time
+// It's defined as a variable so it can be mocked in tests
+var timeNow = func() time.Time {
+    return time.Now()
+}
+
