@@ -2,7 +2,10 @@ package main
 
 import (
 	"example/go_api_swe/database"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	_ "example/go_api_swe/docs" // Swagger docs (hasil dari swag init)
 
@@ -14,7 +17,35 @@ import (
 // @in header
 // @name token
 
+// initImageDirectory ensures the images directory exists
+func initImageDirectory() {
+	// The image directory path is defined in database/photo.go as "./images"
+	imageDir := "./images"
+	if _, err := os.Stat(imageDir); os.IsNotExist(err) {
+		log.Printf("Creating images directory: %s", imageDir)
+		if err := os.MkdirAll(imageDir, 0755); err != nil {
+			log.Printf("Failed to create images directory: %v", err)
+		} else {
+			log.Printf("Successfully created images directory")
+			
+			// Get and log absolute path for debugging
+			if absPath, err := filepath.Abs(imageDir); err == nil {
+				log.Printf("Images directory absolute path: %s", absPath)
+			}
+		}
+	} else {
+		log.Printf("Images directory already exists")
+		
+		// Get and log absolute path for debugging
+		if absPath, err := filepath.Abs(imageDir); err == nil {
+			log.Printf("Images directory absolute path: %s", absPath)
+		}
+	}
+}
+
 func main() {
+	// Initialize images directory
+	initImageDirectory()
 
 	mux := http.NewServeMux()
 
@@ -23,6 +54,8 @@ func main() {
 	mux.HandleFunc("/login", database.API_generateJWT)
 	mux.HandleFunc("/register", database.API_register)
 
+	// photo upload
+	
 	// Protected routes (pakai middleware JWT)
 	// CRUD User (4 endpoints)
 	mux.Handle("/selectuser", database.MiddleWare(database.Api_selectAllData))
@@ -68,9 +101,12 @@ func main() {
 	mux.Handle("/addgaji", database.MiddleWare(database.Api_AddGaji)) // POST
 	mux.Handle("/updategaji", database.MiddleWare(database.Api_UpdateGaji)) // PUT
 	mux.Handle("/deletegaji", database.MiddleWare(database.Api_DeleteGaji)) // DELETE
+	// In your routes file
+	// Serve images without authentication middleware
+	mux.HandleFunc("/images/", database.ServeProductImage)
+	// Keep authentication for image uploads
 
 
-	mux.Handle("/images/", database.MiddleWare(database.ServeProductImage))
 
 	// haruse keluar lo ini
 	// CORS setup

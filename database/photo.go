@@ -12,13 +12,19 @@ import (
 	"time"
 )
 
+// Add this function near the top of your photo.go file
+
 // Configuration for image serving
 const (
-    // Use absolute path to your images directory
-    ImageStorageDir = "D:/FINAL PROJECT SEMESTER 4 FILES/go_api_swe/database/images"
+    // Use relative path that works both locally and on VPS
+    ImageStorageDir = "./images"
     // Allowed image extensions to prevent serving arbitrary files
     AllowedExtensions = ".jpg,.jpeg,.png,.gif,.webp,.bmp"
 )
+func isValidTokens(token string) bool {
+    // For image endpoints, we'll allow access without a token
+    return true
+}
 
 // @Summary Serve product image
 // @Description Serve a product image from the server's storage
@@ -68,22 +74,36 @@ func ServeProductImage(w http.ResponseWriter, r *http.Request) {
     // Construct the full path to the image file
     imagePath := filepath.Join(ImageStorageDir, filename)
     log.Printf("Looking for image at: %s", imagePath)
+      // Attempt to resolve absolute path for logging
+    absPath, _ := filepath.Abs(imagePath)
     
     // Check if the file exists
     if _, err := os.Stat(imagePath); os.IsNotExist(err) {
-        log.Printf("Image not found at path: %s", imagePath)
-        log.Printf("Image not found: %s, serving placeholder", imagePath)
+        log.Printf("Image not found at path: %s (abs: %s)", imagePath, absPath)
+        
+        // Ensure the image directory exists
+        if _, err := os.Stat(ImageStorageDir); os.IsNotExist(err) {
+            log.Printf("Warning: Image directory does not exist: %s", ImageStorageDir)
+            if err := os.MkdirAll(ImageStorageDir, 0755); err != nil {
+                log.Printf("Failed to create image directory: %v", err)
+            } else {
+                log.Printf("Created missing image directory: %s", ImageStorageDir)
+            }
+        }
+        
         // Serve placeholder instead
         placeholderPath := filepath.Join(ImageStorageDir, "placeholder.png")
         if _, err := os.Stat(placeholderPath); os.IsNotExist(err) {
+            log.Printf("Placeholder image not found at: %s", placeholderPath)
             // If placeholder doesn't exist, serve a 404 error
             http.Error(w, "Image not found", http.StatusNotFound)
             return
         }
+        log.Printf("Serving placeholder image from: %s", placeholderPath)
         http.ServeFile(w, r, placeholderPath)
         return
     } else {
-        log.Printf("Image found at path: %s", imagePath)
+        log.Printf("Image found at path: %s (abs: %s)", imagePath, absPath)
     }
     
     // Determine content type based on file extension
@@ -169,8 +189,7 @@ func UploadProductImage(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Unsupported file type. Allowed: "+AllowedExtensions, http.StatusBadRequest)
         return
     }
-    
-    // Create uploads directory if it doesn't exist
+      // Create uploads directory if it doesn't exist
     if _, err := os.Stat(ImageStorageDir); os.IsNotExist(err) {
         err = os.MkdirAll(ImageStorageDir, 0755)
         if err != nil {
@@ -178,6 +197,13 @@ func UploadProductImage(w http.ResponseWriter, r *http.Request) {
             http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
             return
         }
+        log.Printf("Created image directory at: %s", ImageStorageDir)
+    }
+    
+    // Log the absolute path for debugging
+    absPath, err := filepath.Abs(ImageStorageDir)
+    if err == nil {
+        log.Printf("Using image directory (absolute path): %s", absPath)
     }
     
     // Generate unique filename to prevent overwriting existing files
