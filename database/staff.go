@@ -815,3 +815,142 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"success": "true", "message": "Absensi berhasil ditambahkan"})
 }
+
+//Customer member
+
+// func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
+// 	db := Koneksi()
+// 	defer db.Close()
+// 	enableCors(&w)
+
+// 	// Cek token
+// 	token := r.Header.Get("token")
+// 	if !isValidToken(token) {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	if r.Method != "POST" {
+// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+// 		return
+// 	}
+
+// 	// Struktur JSON dari frontend
+// 	var data struct {
+// 		Nama          string `json:"nama"`
+// 		NoHP          string `json:"no_hp"`
+// 		Email         string `json:"email"`
+// 		TanggalDaftar string `json:"tanggal_daftar"`
+// 		PointMember   int    `json:"point_member"`
+// 	}
+
+// 	// Decode body JSON
+// 	err := json.NewDecoder(r.Body).Decode(&data)
+// 	if err != nil {
+// 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	// Insert ke database
+// 	_, err = db.Exec(`
+// 		INSERT INTO customer (nama, no_hp, email, tanggal_daftar, point_member)
+// 		VALUES ($1, $2, $3, $4, $5)
+// 	`, data.Nama, data.NoHP, data.Email, data.TanggalDaftar, data.PointMember)
+
+// 	if err != nil {
+// 		log.Println("Insert error:", err)
+// 		http.Error(w, "Gagal menyimpan data customer", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	// Kirim response berhasil
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.WriteHeader(http.StatusCreated)
+// 	json.NewEncoder(w).Encode(map[string]string{
+// 		"success": "true",
+// 		"message": "Customer berhasil ditambahkan",
+// 	})
+// }
+
+func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
+	db := Koneksi()
+	defer db.Close()
+	enableCors(&w)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	// Cek token
+	token := r.Header.Get("token")
+	if !isValidToken(token) {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Struktur JSON dari frontend
+	var data struct {
+		Nama          string `json:"nama"`
+		NoHP          string `json:"no_hp"`
+		Email         string `json:"email"`
+		TanggalDaftar string `json:"tanggal_daftar"`
+		PointMember   int    `json:"point_member"`
+	}
+
+	// Decode body JSON
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Cek apakah customer dengan email sudah ada
+	var existingPoint int
+	err = db.QueryRow("SELECT point_member FROM customer WHERE email = $1", data.Email).Scan(&existingPoint)
+
+	if err == sql.ErrNoRows {
+		// Belum ada -> Insert
+		_, err = db.Exec(`
+			INSERT INTO customer (nama, no_hp, email, tanggal_daftar, point_member)
+			VALUES ($1, $2, $3, $4, $5)
+		`, data.Nama, data.NoHP, data.Email, data.TanggalDaftar, data.PointMember)
+
+		if err != nil {
+			log.Println("Insert error:", err)
+			http.Error(w, "Gagal menyimpan data customer", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{
+			"success": "true",
+			"message": "Customer berhasil ditambahkan",
+		})
+		return
+
+	} else if err == nil {
+		// Sudah ada -> Update poin
+		newPoint := existingPoint + data.PointMember
+		_, err = db.Exec("UPDATE customer SET point_member = $1 WHERE email = $2", newPoint, data.Email)
+
+		if err != nil {
+			log.Println("Update error:", err)
+			http.Error(w, "Gagal menambahkan poin customer", http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"success": "true",
+			"message": "Customer sudah ada, poin berhasil ditambahkan",
+		})
+		return
+
+	} else {
+		log.Println("Query error:", err)
+		http.Error(w, "Gagal memproses permintaan", http.StatusInternalServerError)
+		return
+	}
+}
