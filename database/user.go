@@ -140,7 +140,7 @@ func Koneksi() *sql.DB {
 		host     = "localhost"
 		port     = 5432
 		user     = "postgres"
-		password = "12345678"
+		password = "12460"
 		dbname   = "frozen_food_v3"
 	)
 

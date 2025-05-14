@@ -786,9 +786,6 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 		JamMasuk   string `json:"jam_masuk"`
 		Status     string `json:"status"`
 		Keterangan string `json:"keterangan"`
-		// Latitude   float64 `json:"latitude"`
-		// Longitude  float64 `json:"longitude"`
-		// // Timestamp  string  `json:"timestamp"` // HAPUS atau KOMEN saja
 	}
 
 	// Dekode data JSON dari body request
@@ -800,7 +797,7 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 
 	// Query untuk insert data absensi
 	_, err = db.Exec(`
-		INSERT INTO absensi (staff_id, tanggal, jam_masuk, status, keterangan )
+		INSERT INTO absensi (staff_id, tanggal, jam_masuk, status, keterangan)
 	VALUES ($1, $2, $3, $4, $5)`,
 		data.StaffID, data.Tanggal, data.JamMasuk, data.Status, data.Keterangan)
 
@@ -953,4 +950,77 @@ func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Gagal memproses permintaan", http.StatusInternalServerError)
 		return
 	}
+}
+
+// @Summary Get staff attendance logs
+// @Description Get all attendance logs from the database
+// @Tags Staff
+// @Accept json
+// @Produce json
+// @Success 200 {array} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /attendancelog [get]
+func Api_getAttendanceLogs(w http.ResponseWriter, r *http.Request) {
+	db := Koneksi()
+	defer db.Close()
+	enableCors(&w)
+
+	// Check token
+	token := r.Header.Get("token")
+	if !isValidToken(token) {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	// Query all attendance logs
+	rows, err := db.Query(`
+        SELECT a.id, a.staff_id, s.nama, a.tanggal, a.jam_masuk, a.jam_keluar, a.status, a.keterangan
+        FROM absensi a
+        LEFT JOIN staff s ON a.staff_id = s.id
+        ORDER BY a.tanggal DESC, a.jam_masuk DESC
+    `)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	// Parse rows into result
+	var result []map[string]interface{}
+	for rows.Next() {
+		var id, staffID int
+		var nama, tanggal, status, keterangan string
+		var jamMasuk string
+		var jamKeluar *string // Using pointer for nullable value
+
+		err := rows.Scan(&id, &staffID, &nama, &tanggal, &jamMasuk, &jamKeluar, &status, &keterangan)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Create map for each attendance log
+		attendance := map[string]interface{}{
+			"id":         id,
+			"staff_id":   staffID,
+			"nama":       nama,
+			"tanggal":    tanggal,
+			"jam_masuk":  jamMasuk,
+			"jam_keluar": nil, // Default to nil
+			"status":     status,
+			"keterangan": keterangan,
+		}
+
+		// If jamKeluar is not null, update the value
+		if jamKeluar != nil {
+			attendance["jam_keluar"] = *jamKeluar
+		}
+
+		result = append(result, attendance)
+	}
+
+	// Return the attendance logs as JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
