@@ -108,7 +108,9 @@ func main() {
 
 
 
-	// haruse keluar lo ini
+	// Customer
+	mux.Handle("/addcustomer", database.MiddleWare(database.Api_addCustomer)) // POST
+
 	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},

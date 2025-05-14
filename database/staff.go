@@ -813,6 +813,145 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"success": "true", "message": "Absensi berhasil ditambahkan"})
 }
 
+//Customer member
+
+// func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
+// 	db := Koneksi()
+// 	defer db.Close()
+// 	enableCors(&w)
+
+// 	// Cek token
+// 	token := r.Header.Get("token")
+// 	if !isValidToken(token) {
+// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	if r.Method != "POST" {
+// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+// 		return
+// 	}
+
+// 	// Struktur JSON dari frontend
+// 	var data struct {
+// 		Nama          string `json:"nama"`
+// 		NoHP          string `json:"no_hp"`
+// 		Email         string `json:"email"`
+// 		TanggalDaftar string `json:"tanggal_daftar"`
+// 		PointMember   int    `json:"point_member"`
+// 	}
+
+// 	// Decode body JSON
+// 	err := json.NewDecoder(r.Body).Decode(&data)
+// 	if err != nil {
+// 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	// Insert ke database
+// 	_, err = db.Exec(`
+// 		INSERT INTO customer (nama, no_hp, email, tanggal_daftar, point_member)
+// 		VALUES ($1, $2, $3, $4, $5)
+// 	`, data.Nama, data.NoHP, data.Email, data.TanggalDaftar, data.PointMember)
+
+// 	if err != nil {
+// 		log.Println("Insert error:", err)
+// 		http.Error(w, "Gagal menyimpan data customer", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	// Kirim response berhasil
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.WriteHeader(http.StatusCreated)
+// 	json.NewEncoder(w).Encode(map[string]string{
+// 		"success": "true",
+// 		"message": "Customer berhasil ditambahkan",
+// 	})
+// }
+
+func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
+	db := Koneksi()
+	defer db.Close()
+	enableCors(&w)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	// Cek token
+	token := r.Header.Get("token")
+	if !isValidToken(token) {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Struktur JSON dari frontend
+	var data struct {
+		Nama          string `json:"nama"`
+		NoHP          string `json:"no_hp"`
+		Email         string `json:"email"`
+		TanggalDaftar string `json:"tanggal_daftar"`
+		PointMember   int    `json:"point_member"`
+	}
+
+	// Decode body JSON
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Cek apakah customer dengan email sudah ada
+	var existingPoint int
+	err = db.QueryRow("SELECT point_member FROM customer WHERE email = $1", data.Email).Scan(&existingPoint)
+
+	if err == sql.ErrNoRows {
+		// Belum ada -> Insert
+		_, err = db.Exec(`
+			INSERT INTO customer (nama, no_hp, email, tanggal_daftar, point_member)
+			VALUES ($1, $2, $3, $4, $5)
+		`, data.Nama, data.NoHP, data.Email, data.TanggalDaftar, data.PointMember)
+
+		if err != nil {
+			log.Println("Insert error:", err)
+			http.Error(w, "Gagal menyimpan data customer", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{
+			"success": "true",
+			"message": "Customer berhasil ditambahkan",
+		})
+		return
+
+	} else if err == nil {
+		// Sudah ada -> Update poin
+		newPoint := existingPoint + data.PointMember
+		_, err = db.Exec("UPDATE customer SET point_member = $1 WHERE email = $2", newPoint, data.Email)
+
+		if err != nil {
+			log.Println("Update error:", err)
+			http.Error(w, "Gagal menambahkan poin customer", http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"success": "true",
+			"message": "Customer sudah ada, poin berhasil ditambahkan",
+		})
+		return
+
+	} else {
+		log.Println("Query error:", err)
+		http.Error(w, "Gagal memproses permintaan", http.StatusInternalServerError)
+		return
+	}
+}
+
 // @Summary Get staff attendance logs
 // @Description Get all attendance logs from the database
 // @Tags Staff
@@ -823,65 +962,65 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} map[string]string
 // @Router /attendancelog [get]
 func Api_getAttendanceLogs(w http.ResponseWriter, r *http.Request) {
-    db := Koneksi()
-    defer db.Close()
-    enableCors(&w)
+	db := Koneksi()
+	defer db.Close()
+	enableCors(&w)
 
-    // Check token
-    token := r.Header.Get("token")
-    if !isValidToken(token) {
-        http.Error(w, "Invalid token", http.StatusUnauthorized)
-        return
-    }
+	// Check token
+	token := r.Header.Get("token")
+	if !isValidToken(token) {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
 
-    // Query all attendance logs
-    rows, err := db.Query(`
+	// Query all attendance logs
+	rows, err := db.Query(`
         SELECT a.id, a.staff_id, s.nama, a.tanggal, a.jam_masuk, a.jam_keluar, a.status, a.keterangan
         FROM absensi a
         LEFT JOIN staff s ON a.staff_id = s.id
         ORDER BY a.tanggal DESC, a.jam_masuk DESC
     `)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
 
-    // Parse rows into result
-    var result []map[string]interface{}
-    for rows.Next() {
-        var id, staffID int
-        var nama, tanggal, status, keterangan string
-        var jamMasuk string
-        var jamKeluar *string // Using pointer for nullable value
+	// Parse rows into result
+	var result []map[string]interface{}
+	for rows.Next() {
+		var id, staffID int
+		var nama, tanggal, status, keterangan string
+		var jamMasuk string
+		var jamKeluar *string // Using pointer for nullable value
 
-        err := rows.Scan(&id, &staffID, &nama, &tanggal, &jamMasuk, &jamKeluar, &status, &keterangan)
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
+		err := rows.Scan(&id, &staffID, &nama, &tanggal, &jamMasuk, &jamKeluar, &status, &keterangan)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-        // Create map for each attendance log
-        attendance := map[string]interface{}{
-            "id":         id,
-            "staff_id":   staffID,
-            "nama":       nama,
-            "tanggal":    tanggal,
-            "jam_masuk":  jamMasuk,
-            "jam_keluar": nil, // Default to nil
-            "status":     status,
-            "keterangan": keterangan,
-        }
+		// Create map for each attendance log
+		attendance := map[string]interface{}{
+			"id":         id,
+			"staff_id":   staffID,
+			"nama":       nama,
+			"tanggal":    tanggal,
+			"jam_masuk":  jamMasuk,
+			"jam_keluar": nil, // Default to nil
+			"status":     status,
+			"keterangan": keterangan,
+		}
 
-        // If jamKeluar is not null, update the value
-        if jamKeluar != nil {
-            attendance["jam_keluar"] = *jamKeluar
-        }
+		// If jamKeluar is not null, update the value
+		if jamKeluar != nil {
+			attendance["jam_keluar"] = *jamKeluar
+		}
 
-        result = append(result, attendance)
-    }
+		result = append(result, attendance)
+	}
 
-    // Return the attendance logs as JSON
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(result)
+	// Return the attendance logs as JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
