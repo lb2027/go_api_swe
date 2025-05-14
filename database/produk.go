@@ -555,8 +555,9 @@ func GetDailySales(w http.ResponseWriter, r *http.Request) {
     }
 
     // SQL query to calculate total sales for the given date
+    // Use COALESCE to handle NULL values
     sqlQuery := `
-        SELECT SUM(total_harga)
+        SELECT COALESCE(SUM(total_harga), 0)
         FROM transaksi
         WHERE DATE(tanggal) = $1
     `
@@ -564,13 +565,8 @@ func GetDailySales(w http.ResponseWriter, r *http.Request) {
     var totalSales float64
     err = db.QueryRow(sqlQuery, date).Scan(&totalSales)
     if err != nil {
-        if err == sql.ErrNoRows {
-            // If there are no sales for the given date, return 0
-            totalSales = 0
-        } else {
-            http.Error(w, "Failed to fetch daily sales: "+err.Error(), http.StatusInternalServerError)
-            return
-        }
+        http.Error(w, "Failed to fetch daily sales: "+err.Error(), http.StatusInternalServerError)
+        return
     }
 
     // Create a map to hold the result
@@ -606,11 +602,11 @@ func GetWeeklySales(w http.ResponseWriter, r *http.Request) {
 
     // SQL query to calculate total sales for each day in the given date range
     sqlQuery := `
-        SELECT DATE(tanggal), SUM(total_harga)
-        FROM transaksi
-        WHERE DATE(tanggal) >= $1 AND DATE(tanggal) <= $2
-        GROUP BY DATE(tanggal)
-        ORDER BY DATE(tanggal)
+        SELECT DATE(tanggal), COALESCE(SUM(total_harga), 0)
+		FROM transaksi
+		WHERE DATE(tanggal) >= $1 AND DATE(tanggal) <= $2
+		GROUP BY DATE(tanggal)
+		ORDER BY DATE(tanggal)
     `
 
     rows, err := db.Query(sqlQuery, startDate, endDate)
@@ -661,9 +657,9 @@ func GetMonthlyRevenue(w http.ResponseWriter, r *http.Request) {
 
     // SQL query to calculate total revenue for the current month
     sqlQuery := `
-        SELECT SUM(total_harga)
-        FROM transaksi
-        WHERE tanggal >= $1 AND tanggal <= $2
+        SELECT COALESCE(SUM(total_harga), 0)
+		FROM transaksi
+		WHERE tanggal >= $1 AND tanggal <= $2
     `
 
     var totalRevenue float64
