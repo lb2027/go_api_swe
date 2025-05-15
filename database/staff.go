@@ -813,62 +813,6 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"success": "true", "message": "Absensi berhasil ditambahkan"})
 }
 
-//Customer member
-
-// func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
-// 	db := Koneksi()
-// 	defer db.Close()
-// 	enableCors(&w)
-
-// 	// Cek token
-// 	token := r.Header.Get("token")
-// 	if !isValidToken(token) {
-// 		http.Error(w, "Invalid token", http.StatusUnauthorized)
-// 		return
-// 	}
-
-// 	if r.Method != "POST" {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	// Struktur JSON dari frontend
-// 	var data struct {
-// 		Nama          string `json:"nama"`
-// 		NoHP          string `json:"no_hp"`
-// 		Email         string `json:"email"`
-// 		TanggalDaftar string `json:"tanggal_daftar"`
-// 		PointMember   int    `json:"point_member"`
-// 	}
-
-// 	// Decode body JSON
-// 	err := json.NewDecoder(r.Body).Decode(&data)
-// 	if err != nil {
-// 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	// Insert ke database
-// 	_, err = db.Exec(`
-// 		INSERT INTO customer (nama, no_hp, email, tanggal_daftar, point_member)
-// 		VALUES ($1, $2, $3, $4, $5)
-// 	`, data.Nama, data.NoHP, data.Email, data.TanggalDaftar, data.PointMember)
-
-// 	if err != nil {
-// 		log.Println("Insert error:", err)
-// 		http.Error(w, "Gagal menyimpan data customer", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Kirim response berhasil
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusCreated)
-// 	json.NewEncoder(w).Encode(map[string]string{
-// 		"success": "true",
-// 		"message": "Customer berhasil ditambahkan",
-// 	})
-// }
-
 func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
 	defer db.Close()
