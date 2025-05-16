@@ -795,11 +795,24 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Query untuk insert data absensi
+	 var staffID int
+	err = db.QueryRow(`SELECT id FROM staff WHERE user_id = $1`, data.StaffID).Scan(&staffID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Staff not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// 
+	// variable for insert staff id 
+
 	_, err = db.Exec(`
 		INSERT INTO absensi (staff_id, tanggal, jam_masuk, status, keterangan)
 	VALUES ($1, $2, $3, $4, $5)`,
-		data.StaffID, data.Tanggal, data.JamMasuk, data.Status, data.Keterangan)
+		staffID, data.Tanggal, data.JamMasuk, data.Status, data.Keterangan)
 
 	if err != nil {
 		log.Println("Insert error:", err)
