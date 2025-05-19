@@ -20,7 +20,7 @@ import (
 // initImageDirectory ensures the images directory exists
 func initImageDirectory() {
 	// The image directory path is defined in database/photo.go as "./images"
-	imageDir := "./images"
+	imageDir := "./database/images"
 	if _, err := os.Stat(imageDir); os.IsNotExist(err) {
 		log.Printf("Creating images directory: %s", imageDir)
 		if err := os.MkdirAll(imageDir, 0755); err != nil {

@@ -17,7 +17,7 @@ import (
 // Configuration for image serving
 const (
     // Use relative path that works both locally and on VPS
-    ImageStorageDir = ".database/images"
+    ImageStorageDir = "./database/images"
     // Allowed image extensions to prevent serving arbitrary files
     AllowedExtensions = ".jpg,.jpeg,.png,.gif,.webp,.bmp"
 )
