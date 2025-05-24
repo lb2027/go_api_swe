@@ -20,7 +20,7 @@ import (
 // initImageDirectory ensures the images directory exists
 func initImageDirectory() {
 	// The image directory path is defined in database/photo.go as "./images"
-	imageDir := "./database/images"
+	imageDir := "./images"
 	if _, err := os.Stat(imageDir); os.IsNotExist(err) {
 		log.Printf("Creating images directory: %s", imageDir)
 		if err := os.MkdirAll(imageDir, 0755); err != nil {
@@ -105,12 +105,19 @@ func main() {
 	// Serve images without authentication middleware
 	mux.HandleFunc("/images/", database.ServeProductImage)
 	// Keep authentication for image uploads
+	mux.Handle("/uploadimage", database.MiddleWare(database.UploadProductImage))		
+
+	// In your main.go or routes file, add these new endpoints:
+
+	// Invoice routes
+	mux.Handle("/invoices", database.MiddleWare(database.GetAllInvoices))
+	mux.Handle("/invoice/by-transaction", database.MiddleWare(database.GetInvoiceByTransactionID))
+    mux.Handle("/invoice/print-html", database.MiddleWare(database.GenerateInvoiceHTML))
+    mux.Handle("/invoice/auto-generate", database.MiddleWare(database.AutoGenerateInvoice))
+    mux.Handle("/invoice/update-payment", database.MiddleWare(database.UpdateInvoicePaymentStatus))
 
 
-
-	// Customer
-	mux.Handle("/addcustomer", database.MiddleWare(database.Api_addCustomer)) // POST
-
+	// haruse keluar lo ini
 	// CORS setup
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},

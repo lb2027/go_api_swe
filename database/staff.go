@@ -66,8 +66,10 @@ func Api_getStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} Staff
-// @Failure 500 {object} map[string]string
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /staff [get]
 func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -129,10 +131,13 @@ func Api_getAllStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "Staff ID"
 // @Success 200 {object} Staff
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Failure 400 {object} map[string]string "Error: Invalid ID"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 404 {object} map[string]string "Error: Staff not found"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /staff/{id} [get]
 func Api_getStaffByID(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -196,10 +201,12 @@ func Api_getStaffByID(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param staff body Staff true "Staff data"
-// @Success 201 {object} map[string]interface{}
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 201 {object} map[string]interface{} "message: Staff added successfully, id: staff_id"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON or Missing required fields"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /addstaff [post]
 func Api_addStaff(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -278,11 +285,13 @@ func Api_addStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param staff body Staff true "Staff data"
-// @Success 200 {object} map[string]string
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} map[string]string "message: Staff updated successfully"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON, Missing required fields, or No changes made"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 404 {object} map[string]string "Error: Staff not found"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /updatestaff [put]
 func Api_updateStaff(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -374,11 +383,13 @@ func Api_updateStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id body map[string]int true "Staff ID"
-// @Success 200 {object} map[string]string
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} map[string]string "message: Staff deleted successfully"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON or Missing ID"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 404 {object} map[string]string "Error: Staff not found"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /deletestaff [delete]
 func Api_deleteStaff(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -529,10 +540,12 @@ func Api_bulkDeleteStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param data body map[string]interface{} true "Staff IDs and status"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} map[string]interface{} "message: Staff status updated successfully, updatedCount: number"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON or Missing IDs or status"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /bulkupdatestaffstatus [put]
 func Api_bulkUpdateStaffStatus(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -614,10 +627,12 @@ func Api_bulkUpdateStaffStatus(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param query query string true "Search query"
 // @Success 200 {array} Staff
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Failure 400 {object} map[string]string "Error: Missing search query"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /searchstaff [get]
 func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
@@ -638,7 +653,6 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Search staff by name, email, phone, or status - Fixed for PostgreSQL
 	rows, err := db.Query(`
         SELECT id, nama, no_hp, alamat, email, status_kerja, user_id, tanggal_lahir 
         FROM staff 
@@ -656,9 +670,8 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 	var staffs []Staff
 	for rows.Next() {
 		var staff Staff
-		var userID *int                        // Nullable field
-		var email, alamat, dateOfBirth *string // Nullable fields
-
+		var userID *int                        
+		var email, alamat, dateOfBirth *string 
 		err := rows.Scan(&staff.Staff_id, &staff.Username, &staff.NomorHP, &alamat, &email, &staff.StatusKerja, &userID, &dateOfBirth)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -682,7 +695,6 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 		staffs = append(staffs, staff)
 	}
 
-	// Return the staffs as JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(staffs)
 }
@@ -692,22 +704,22 @@ func Api_searchStaff(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]string
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{} "total: number, statusCount: object"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /staffstats [get]
 func Api_getStaffStats(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
 	defer db.Close()
 	enableCors(&w)
 
-	// Check token
 	token := r.Header.Get("token")
 	if !isValidToken(token) {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
 
-	// Get total staff count
 	var total int
 	err := db.QueryRow("SELECT COUNT(*) FROM staff").Scan(&total)
 	if err != nil {
@@ -749,20 +761,22 @@ func isValidToken(token string) bool {
 	if token == "" {
 		return false
 	}
-
-	// In a real application, you would validate the token
-	// For simplicity, we're just checking if it's not empty
 	return true
 }
 
-// @Summary Get staff statistics
-// @Description Get absensi Staff
+// @Summary Add staff attendance
+// @Description Add a new attendance record for a staff member
 // @Tags Staff
 // @Accept json
 // @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]string
-// @Router /staffstats [get]
+// @Security ApiKeyAuth
+// @Param data body object true "Attendance data"
+// @Success 201 {object} map[string]string "success: true, message: Absensi berhasil ditambahkan"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 404 {object} map[string]string "Error: Staff not found"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
+// @Router /addabsensi [post]
 func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi() // Koneksi ke database
 	defer db.Close()
@@ -779,7 +793,6 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Struktur data yang diterima dari request
 	var data struct {
 		StaffID    int    `json:"staff_id"`
 		Tanggal    string `json:"tanggal"`
@@ -806,8 +819,6 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 
-	// variable for insert staff id 
 
 	_, err = db.Exec(`
 		INSERT INTO absensi (staff_id, tanggal, jam_masuk, status, keterangan)
@@ -826,6 +837,19 @@ func Api_addAbsensi(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"success": "true", "message": "Absensi berhasil ditambahkan"})
 }
 
+// @Summary Add customer
+// @Description Add a new customer or update existing customer's points
+// @Tags Customer
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param data body object true "Customer data"
+// @Success 201 {object} map[string]string "success: true, message: Customer berhasil ditambahkan"
+// @Success 200 {object} map[string]string "success: true, message: Customer sudah ada, poin berhasil ditambahkan"
+// @Failure 400 {object} map[string]string "Error: Invalid JSON"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
+// @Router /addcustomer [post]
 func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
 	defer db.Close()
@@ -914,9 +938,10 @@ func Api_addCustomer(w http.ResponseWriter, r *http.Request) {
 // @Tags Staff
 // @Accept json
 // @Produce json
-// @Success 200 {array} map[string]interface{}
-// @Failure 401 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Security ApiKeyAuth
+// @Success 200 {array} map[string]interface{} "List of attendance records"
+// @Failure 401 {object} map[string]string "Error: Invalid token"
+// @Failure 500 {object} map[string]string "Error: Internal server error"
 // @Router /attendancelog [get]
 func Api_getAttendanceLogs(w http.ResponseWriter, r *http.Request) {
 	db := Koneksi()
