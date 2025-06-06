@@ -161,8 +161,6 @@ func GetInvoiceByTransactionID(w http.ResponseWriter, r *http.Request) {
 
 // Get all invoices with pagination and filters
 func GetAllInvoices(w http.ResponseWriter, r *http.Request) {
-    // Remove enableCors(&w) - handled by main.go now
-    
     db := Koneksi()
     defer db.Close()
 
@@ -197,6 +195,22 @@ func GetAllInvoices(w http.ResponseWriter, r *http.Request) {
         args = append(args, endDate)
     }
 
+    // ✅ FIX: Get total count first (without LIMIT)
+    countQuery := fmt.Sprintf(`
+        SELECT COUNT(DISTINCT th.transaksi_id)
+        FROM transaksi_header th
+        INNER JOIN transaksi_detail td ON th.transaksi_id = td.transaksi_id
+        %s
+    `, whereClause)
+
+    var totalCount int
+    err := db.QueryRow(countQuery, args...).Scan(&totalCount)
+    if err != nil {
+        http.Error(w, "Failed to get total count: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // ✅ FIX: Get paginated data
     sqlQuery := fmt.Sprintf(`
         SELECT 
             th.transaksi_id,
@@ -246,11 +260,14 @@ func GetAllInvoices(w http.ResponseWriter, r *http.Request) {
         invoices = append(invoices, invoice)
     }
 
+    // ✅ FIX: Return both paginated data and total count
     response := map[string]interface{}{
-        "invoices": invoices,
-        "page":     getIntOrDefault(page, 1),
-        "limit":    getIntOrDefault(limit, 10),
-        "total":    len(invoices),
+        "invoices":    invoices,
+        "page":        getIntOrDefault(page, 1),
+        "limit":       getIntOrDefault(limit, 10),
+        "total":       len(invoices),        // Current page count
+        "total_count": totalCount,           // ✅ Total count of ALL invoices
+        "total_pages": (totalCount + getIntOrDefault(limit, 10) - 1) / getIntOrDefault(limit, 10),
     }
 
     w.Header().Set("Content-Type", "application/json")

@@ -95,6 +95,7 @@ func main() {
 	mux.Handle("/staffstats", database.MiddleWare(database.Api_getStaffStats))
 	mux.Handle("/makemestaff", database.MiddleWare(database.Api_getStaff))
 	mux.Handle("/getabsensi", database.MiddleWare(database.Api_getAttendanceLogs))
+	mux.Handle("/addcustomer", database.MiddleWare(database.Api_addCustomer)) // POST
 
 	// Gaji management endpoints (4 endpoints)
 	mux.Handle("/getgaji", database.MiddleWare(database.Api_GetAllGaji)) // GET
@@ -105,7 +106,6 @@ func main() {
 	// Serve images without authentication middleware
 	mux.HandleFunc("/images/", database.ServeProductImage)
 	// Keep authentication for image uploads
-	mux.Handle("/uploadimage", database.MiddleWare(database.UploadProductImage))		
 
 	// In your main.go or routes file, add these new endpoints:
 
