@@ -15,6 +15,7 @@ type Transaksi struct {
 	Tanggal      time.Time`json:"tanggal"`
 }
 
+
 func Select_allTransaksi() []Transaksi {
 	db := Koneksi()
 	rows, err := db.Query("SELECT * FROM transaksi")
@@ -40,7 +41,6 @@ func Select_allTransaksi() []Transaksi {
 // @Produce json
 // @Success 200 {array} Transaksi
 // @Router /selecttransaksi [get]
-// @Security BearerAuth
 func Api_selectAllTransaksi(w http.ResponseWriter, r *http.Request) {
 	dataTransaksi := Select_allTransaksi()
 	dataJson, err := json.Marshal(dataTransaksi)
@@ -51,6 +51,17 @@ func Api_selectAllTransaksi(w http.ResponseWriter, r *http.Request) {
 		w.Write(dataJson)
 	}
 }
+
+// @Summary Ambil transaksi berdasarkan rentang tanggal
+// @Description Mengambil data transaksi dalam rentang tanggal tertentu
+// @Tags Transaksi
+// @Accept json
+// @Produce json
+// @Param start_date query string true "Tanggal awal (YYYY-MM-DD)"
+// @Param end_date query string true "Tanggal akhir (YYYY-MM-DD)"
+// @Success 200 {array} Transaksi
+// @Failure 400 {object} map[string]string "Error: Format tanggal tidak valid"
+// @Router /transactionbydate [get]
 
 func AddDataTransaksi(namaProduk string, harga float64, jumlahTerjual int, totalHarga float64, tanggal string) {
     db := Koneksi()
@@ -75,7 +86,6 @@ func AddDataTransaksi(namaProduk string, harga float64, jumlahTerjual int, total
 // @Success 201 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Router /addtransaksi [post]
-// @Security BearerAuth
 func Api_addTransaksi(w http.ResponseWriter, r *http.Request) {
     var transaksi Transaksi
     err := json.NewDecoder(r.Body).Decode(&transaksi)

@@ -54,7 +54,7 @@ func API_generateJWT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// **Authentication Logic**
+	// Authentication Logic
 	isAuthenticated, err := AuthenticateUser(creds.Username, creds.Password)
 	if err != nil {
 		http.Error(w, "Authentication failed", http.StatusInternalServerError)
@@ -66,10 +66,10 @@ func API_generateJWT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// **Retrieve the user's role from the database**
-	role, err := GetUserRole(creds.Username) // Implement this function
+	// Retrieve the user's role and ID from the database
+	role, userId, err := GetUserRoleAndID(creds.Username)
 	if err != nil {
-		http.Error(w, "Failed to get user role", http.StatusInternalServerError)
+		http.Error(w, "Failed to get user information", http.StatusInternalServerError)
 		return
 	}
 
@@ -79,31 +79,33 @@ func API_generateJWT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// **Include the role in the response**
+	// Include the role and user_id in the response
 	response := map[string]string{
-		"token": tokenString,
-		"role":  role, // Add the role to the response
+		"token":   tokenString,
+		"role":    role,
+		"user_id": userId,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-// Implement this function to retrieve the user's role from the database
-func GetUserRole(username string) (string, error) {
+// Implement this function to retrieve the user's role and ID from the database
+func GetUserRoleAndID(username string) (string, string, error) {
 	db := Koneksi()
 	defer db.Close()
 
 	var role string
-	err := db.QueryRow("SELECT role FROM users WHERE username = $1", username).Scan(&role)
+	var userId string
+	err := db.QueryRow("SELECT role, user_id FROM users WHERE username = $1", username).Scan(&role, &userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", fmt.Errorf("user not found")
+			return "", "", fmt.Errorf("user not found")
 		}
-		return "", err
+		return "", "", err
 	}
 
-	return role, nil
+	return role, userId, nil
 }
 
 func AuthenticateUser(username, password string) (bool, error) {
@@ -156,29 +158,73 @@ func RegisterUser(username, password, role string) error {
 // @Failure 500 {object} map[string]string
 // @Router /register [post]
 func API_register(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w) // Add this if it's not already there
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var creds Credentials
+	var creds struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Set a default role for new users
-	role := "user"
+	// Set a default role if none provided
+	role := creds.Role
+	if role == "" {
+		role = "user"
+	}
 
-	err = RegisterUser(creds.Username, creds.Password, role)
+	db := Koneksi()
+	defer db.Close()
+
+	// Check if username already exists
+	var exists bool
+	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", creds.Username).Scan(&exists)
 	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	if exists {
+		http.Error(w, "Username already exists", http.StatusBadRequest)
+		return
+	}
+
+	// Insert new user and get the ID
+	var userId int
+	err = db.QueryRow("INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING user_id",
+		creds.Username, creds.Password, role).Scan(&userId)
+
+	if err != nil {
+		fmt.Println("Registration error:", err)
 		http.Error(w, "Registration failed", http.StatusInternalServerError)
 		return
 	}
 
+	// Generate token
+	tokenString, err := generateJWT(creds.Username)
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	// Return success with user_id and token
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(`{"message": "User registered successfully"}`))
+	response := map[string]interface{}{
+		"message": "User registered successfully",
+		"user_id": userId,
+		"token": tokenString,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func MiddleWare(next http.HandlerFunc) http.Handler {
@@ -214,4 +260,5 @@ func MiddleWare(next http.HandlerFunc) http.Handler {
 	})
 }
 
+// Function to retrieve both role and user ID in a single database call
 

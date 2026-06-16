@@ -1,638 +1,1297 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "contact": {}
-  },
-  "paths": {
-    "/addproduk": {
-      "post": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Menambahkan data produk ke dalam database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Produk"],
-        "summary": "Tambah produk baru",
-        "parameters": [
-          {
-            "description": "Data produk",
-            "name": "produk",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Produk"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
     },
-    "/addtransaksi": {
-      "post": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Menambahkan data transaksi baru",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Transaksi"],
-        "summary": "Tambah transaksi",
-        "parameters": [
-          {
-            "description": "Data transaksi",
-            "name": "transaksi",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Transaksi"
+    "paths": {
+        "/addproduk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menambahkan data produk ke dalam database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Tambah produk baru",
+                "parameters": [
+                    {
+                        "description": "Data produk",
+                        "name": "produk",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Produk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+        },
+        "/addstaff": {
+            "post": {
+                "description": "Add a new staff member to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Add new staff",
+                "parameters": [
+                    {
+                        "description": "Staff data",
+                        "name": "staff",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Staff"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+        },
+        "/addtransaksi": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menambahkan data transaksi baru",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaksi"
+                ],
+                "summary": "Tambah transaksi",
+                "parameters": [
+                    {
+                        "description": "Data transaksi",
+                        "name": "transaksi",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Transaksi"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
-          }
+        },
+        "/adduser": {
+            "post": {
+                "description": "Menambahkan data user ke database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Menambahkan user baru",
+                "parameters": [
+                    {
+                        "description": "Data user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bulkdeletestaff": {
+            "delete": {
+                "description": "Delete multiple staff members from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Bulk delete staff",
+                "parameters": [
+                    {
+                        "description": "Staff IDs",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bulkupdatestaffstatus": {
+            "put": {
+                "description": "Update status for multiple staff members",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Bulk update staff status",
+                "parameters": [
+                    {
+                        "description": "Staff IDs and status",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deleteproduk": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Menghapus produk berdasarkan ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Hapus produk",
+                "parameters": [
+                    {
+                        "description": "Produk yang akan dihapus (berdasarkan ID)",
+                        "name": "produk",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Produk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deletestaff": {
+            "delete": {
+                "description": "Delete a staff member from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Delete staff",
+                "parameters": [
+                    {
+                        "description": "Staff ID",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deleteuser": {
+            "delete": {
+                "description": "Menghapus user berdasarkan ID dari body JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Hapus user",
+                "parameters": [
+                    {
+                        "description": "ID user yang akan dihapus",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Menghasilkan JWT token untuk autentikasi API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate JWT Token",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "creds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/makemestaff": {
+            "post": {
+                "description": "Make me staff so I can get access to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Make me staff",
+                "parameters": [
+                    {
+                        "description": "Data staff",
+                        "name": "staff",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Staff"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Registers a new user in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "creds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/searchstaff": {
+            "get": {
+                "description": "Search for staff by name, email, phone, or status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Search staff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.Staff"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/selectproduk": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil semua data produk dari database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Ambil semua produk",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.Produk"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/selectprodukByid": {
+            "get": {
+                "description": "Mengambil data produk berdasarkan ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Ambil produk berdasarkan ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/database.Produk"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/selecttransaksi": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mengambil semua data transaksi dari database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaksi"
+                ],
+                "summary": "Ambil semua transaksi",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.Transaksi"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/soldproduk": {
+            "post": {
+                "description": "Decreases stock in 'produk' table and records sale in 'stok_keluar' table",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Endpoint to handle sold products",
+                "parameters": [
+                    {
+                        "description": "List of sold items",
+                        "name": "soldItems",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.SoldItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sold items processed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff": {
+            "get": {
+                "description": "Get all staff from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Get all staff",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.Staff"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/staff/{id}": {
+            "get": {
+                "description": "Get staff by ID from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Get staff by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Staff ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/database.Staff"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/staffstats": {
+            "get": {
+                "description": "Get statistics about staff members",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Get staff statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/updateproduk": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Memperbarui informasi produk berdasarkan ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Update data produk",
+                "parameters": [
+                    {
+                        "description": "Data produk yang diperbarui",
+                        "name": "produk",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Produk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/updatestaff": {
+            "put": {
+                "description": "Update an existing staff member in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Update staff",
+                "parameters": [
+                    {
+                        "description": "Staff data",
+                        "name": "staff",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.Staff"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/updateuser": {
+            "put": {
+                "description": "Memperbarui data user berdasarkan ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "description": "Data user yang diperbarui",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/database.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "description": "Get list of all user from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get all user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.User"
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
     },
-    "/adduser": {
-      "post": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Menambahkan data user ke database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["User"],
-        "summary": "Menambahkan user baru",
-        "parameters": [
-          {
-            "description": "Data user",
-            "name": "user",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.User"
+    "definitions": {
+        "database.Credentials": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
             }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+        },
+        "database.Produk": {
+            "type": "object",
+            "properties": {
+                "foto": {
+                    "type": "string"
+                },
+                "harga": {
+                    "type": "number"
+                },
+                "harga_beli": {
+                    "type": "number"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "produk_id": {
+                    "type": "integer"
+                },
+                "stok": {
+                    "type": "integer"
+                },
+                "supplier": {
+                    "type": "string"
+                }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+        },
+        "database.SoldItem": {
+            "type": "object",
+            "properties": {
+                "harga": {
+                    "type": "number"
+                },
+                "nama_produk": {
+                    "type": "string"
+                },
+                "produk_id": {
+                    "type": "integer"
+                },
+                "stok_keluar": {
+                    "type": "integer"
+                }
             }
-          }
+        },
+        "database.Staff": {
+            "type": "object",
+            "properties": {
+                "alamat": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "no_hp": {
+                    "type": "string"
+                },
+                "status_kerja": {
+                    "type": "string"
+                },
+                "tanggal_lahir": {
+                    "description": "Added field for DOB",
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "database.Transaksi": {
+            "type": "object",
+            "properties": {
+                "harga": {
+                    "type": "number"
+                },
+                "jumlah_terjual": {
+                    "type": "integer"
+                },
+                "nama_produk": {
+                    "type": "string"
+                },
+                "tanggal": {
+                    "type": "string"
+                },
+                "total_harga": {
+                    "type": "number"
+                },
+                "transaksi_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "database.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         }
-      }
     },
-    "/deleteproduk": {
-      "delete": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Menghapus produk berdasarkan ID",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Produk"],
-        "summary": "Hapus produk",
-        "parameters": [
-          {
-            "description": "Produk yang akan dihapus (berdasarkan ID)",
-            "name": "produk",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Produk"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
         }
-      }
-    },
-    "/deleteuser": {
-      "delete": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Menghapus user berdasarkan ID dari body JSON",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["User"],
-        "summary": "Hapus user",
-        "parameters": [
-          {
-            "description": "ID user yang akan dihapus",
-            "name": "user",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.User"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content",
-            "schema": {
-              "type": "string"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/login": {
-      "post": {
-        "description": "Menghasilkan JWT token untuk autentikasi API",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Auth"],
-        "summary": "Generate JWT Token",
-        "parameters": [
-          {
-            "description": "User credentials",
-            "name": "creds",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Credentials"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/register": {
-      "post": {
-        "description": "Registers a new user in the database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Auth"],
-        "summary": "Register a new user",
-        "parameters": [
-          {
-            "description": "User credentials",
-            "name": "creds",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Credentials"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/login": {
-      "post": {
-        "description": "Menghasilkan JWT token untuk autentikasi API",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Auth"],
-        "summary": "Generate JWT Token",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "405": {
-            "description": "Method Not Allowed",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/selectproduk": {
-      "get": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Mengambil semua data produk dari database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Produk"],
-        "summary": "Ambil semua produk",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/database.Produk"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/selecttransaksi": {
-      "get": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Mengambil semua data transaksi dari database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Transaksi"],
-        "summary": "Ambil semua transaksi",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/database.Transaksi"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/selectuser": {
-      "get": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "tags": ["User"],
-        "summary": "Menampilakan semua user",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
-        }
-      }
-    },
-    "/updateproduk": {
-      "put": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Memperbarui informasi produk berdasarkan ID",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["Produk"],
-        "summary": "Update data produk",
-        "parameters": [
-          {
-            "description": "Data produk yang diperbarui",
-            "name": "produk",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.Produk"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/updateuser": {
-      "put": {
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Memperbarui data user berdasarkan ID",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["User"],
-        "summary": "Update user",
-        "parameters": [
-          {
-            "description": "Data user yang diperbarui",
-            "name": "user",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/database.User"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content",
-            "schema": {
-              "type": "string"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/user": {
-      "get": {
-        "description": "Get list of all user from database",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "tags": ["User"],
-        "summary": "Get all user",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/database.User"
-              }
-            }
-          }
-        }
-      }
     }
-  },
-  "definitions": {
-    "database.Credentials": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "database.Produk": {
-      "type": "object",
-      "properties": {
-        "foto": {
-          "type": "string"
-        },
-        "harga": {
-          "type": "number"
-        },
-        "harga_beli": {
-          "type": "number"
-        },
-        "name": {
-          "type": "string"
-        },
-        "produk_id": {
-          "type": "integer"
-        },
-        "stok": {
-          "type": "integer"
-        },
-        "supplier": {
-          "type": "string"
-        }
-      }
-    },
-    "database.Transaksi": {
-      "type": "object",
-      "properties": {
-        "harga": {
-          "type": "number"
-        },
-        "jumlah_terjual": {
-          "type": "integer"
-        },
-        "nama_produk": {
-          "type": "string"
-        },
-        "tanggal": {
-          "type": "string"
-        },
-        "total_harga": {
-          "type": "number"
-        },
-        "transaksi_id": {
-          "type": "integer"
-        }
-      }
-    },
-    "database.User": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "password": {
-          "type": "string"
-        },
-        "role": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    }
-  },
-  "securityDefinitions": {
-    "BearerAuth": {
-      "type": "apiKey",
-      "name": "token",
-      "in": "header"
-    }
-  }
 }

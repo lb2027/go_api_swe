@@ -45,72 +45,7 @@ func Select_alluser() []User {
 	return userArray
 }
 
-// func getUserById(id string) []User {
-//     db := Koneksi()
-//     var user = User{}
-//     var userArray []User
 
-//     statement, err := db.Query("SELECT user_id, username, password, role FROM users WHERE user_id = $1", id)
-
-//     if err != nil {
-//         panic(err.Error())
-//     } else {
-//         for statement.Next() {
-//             err = statement.Scan(&user.User_id, &user.Username, &user.Password, &user.Role)
-//             if err != nil {
-//                 panic(err.Error())
-//             } else {
-//                 userArray = append(userArray, User{User_id: user.User_id, Username: user.Username, Password: user.Password, Role: user.Role})
-//             }
-//         }
-//     }
-//     return userArray
-// }
-
-
-// func getUserByname(name string) []User {
-//     db := Koneksi()
-//     var user = User{}
-//     var userArray []User
-
-//     statement, err := db.Query("SELECT user_id, username, password, role FROM users WHERE username LIKE $1", "%"+name+"%")
-
-//     if err != nil {
-//         panic(err.Error())
-//     } else {
-//         for statement.Next() {
-//             err = statement.Scan(&user.User_id, &user.Username, &user.Password, &user.Role)
-//             if err != nil {
-//                 panic(err.Error())
-//             } else {
-//                 userArray = append(userArray, User{User_id: user.User_id, Username: user.Username, Password: user.Password, Role: user.Role})
-//             }
-//         }
-//     }
-//     return userArray
-// }
-
-// func getNamenAdress(address string) []User {
-//     db := Koneksi()
-//     var user = User{}
-//     var userArray []User
-
-//     statement, err := db.Query("SELECT username, address FROM users WHERE address LIKE $1", "%"+address+"%")
-
-//     if err != nil {
-//         panic(err.Error())
-//     } else {
-//         for statement.Next() {
-//             err = statement.Scan(&user.Username, &user.Address)
-//             if err != nil {
-//                 panic(err.Error())
-//             } else {
-//                 userArray = append(userArray, User{Username: user.Username, Address: user.Address})
-//             }
-//         }
-//     }
-//     return userArray
-// }
 
 func addData(username string, password string, role string) {
     db := Koneksi()
@@ -124,16 +59,6 @@ func addData(username string, password string, role string) {
     }
 }
 
-// func deleteUserById(id string) {
-// 	db := Koneksi()
-// 	statement, err := db.Prepare("DELETE FROM users WHERE user_id = $1")
-// 	if err != nil {
-// 		panic(err.Error())
-// 	} else {
-// 		statement.Exec(id)
-// 	}
-// }
-
 
 // connect
 func Koneksi() *sql.DB {
@@ -142,7 +67,7 @@ func Koneksi() *sql.DB {
 		port     = 5432
 		user     = "postgres"
 		password = "12460"
-		dbname   = "frozen_food"
+		dbname   = "frozen_food_v3"
 	)
 	
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
@@ -191,58 +116,6 @@ func Api_selectAllData(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
-// @Summary Cari user berdasarkan ID
-// @Description Mengambil data user berdasarkan ID
-// @Tags User
-// @Accept json
-// @Produce json
-// @Param id query string true "User ID"
-// @Success 200 {array} User
-// @Failure 400 {object} map[string]string
-// // @Router /getuserbyid [get]
-// func Api_getUserByID(w http.ResponseWriter, r *http.Request) {
-// 	id := r.URL.Query().Get("id")
-// 	if id == "" {
-// 		http.Error(w, "no id found", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	user := getUserById(id)
-// 	dataJson, err := json.Marshal(user)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	} else {
-// 		w.Write(dataJson)
-// 	}
-
-// }
-
-// @Summary Cari user berdasarkan nama
-// @Description Mengambil data user berdasarkan nama
-// @Tags User
-// @Accept json
-// @Produce json
-// @Param name query string true "Username"
-// @Success 200 {array} User
-// @Failure 400 {object} map[string]string
-// @Router /getuserbyname [get]
-// func Api_getUserByName(w http.ResponseWriter, r *http.Request) {
-// 	name := r.URL.Query().Get("name")
-// 	if name == "" {
-// 		http.Error(w, "no id found", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	user := getUserByname(name)
-// 	dataJson, err := json.Marshal(user)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	} else {
-// 		io.WriteString(w, string(dataJson))
-// 	}
-
-// }
 
 // @Summary Hapus user
 // @Description Menghapus user berdasarkan ID dari body JSON

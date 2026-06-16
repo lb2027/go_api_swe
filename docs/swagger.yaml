@@ -14,7 +14,7 @@ definitions:
         type: number
       harga_beli:
         type: number
-      name:
+      nama:
         type: string
       produk_id:
         type: integer
@@ -22,6 +22,37 @@ definitions:
         type: integer
       supplier:
         type: string
+    type: object
+  database.SoldItem:
+    properties:
+      harga:
+        type: number
+      nama_produk:
+        type: string
+      produk_id:
+        type: integer
+      stok_keluar:
+        type: integer
+    type: object
+  database.Staff:
+    properties:
+      alamat:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      nama:
+        type: string
+      no_hp:
+        type: string
+      status_kerja:
+        type: string
+      tanggal_lahir:
+        description: Added field for DOB
+        type: string
+      user_id:
+        type: integer
     type: object
   database.Transaksi:
     properties:
@@ -55,17 +86,17 @@ paths:
   /addproduk:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Menambahkan data produk ke dalam database
       parameters:
-        - description: Data produk
-          in: body
-          name: produk
-          required: true
-          schema:
-            $ref: "#/definitions/database.Produk"
+      - description: Data produk
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -80,24 +111,59 @@ paths:
               type: string
             type: object
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Tambah produk baru
       tags:
-        - Produk
+      - Produk
+  /addstaff:
+    post:
+      consumes:
+      - application/json
+      description: Add a new staff member to the database
+      parameters:
+      - description: Staff data
+        in: body
+        name: staff
+        required: true
+        schema:
+          $ref: '#/definitions/database.Staff'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add new staff
+      tags:
+      - Staff
   /addtransaksi:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Menambahkan data transaksi baru
       parameters:
-        - description: Data transaksi
-          in: body
-          name: transaksi
-          required: true
-          schema:
-            $ref: "#/definitions/database.Transaksi"
+      - description: Data transaksi
+        in: body
+        name: transaksi
+        required: true
+        schema:
+          $ref: '#/definitions/database.Transaksi'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -112,24 +178,24 @@ paths:
               type: string
             type: object
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Tambah transaksi
       tags:
-        - Transaksi
+      - Transaksi
   /adduser:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Menambahkan data user ke database
       parameters:
-        - description: Data user
-          in: body
-          name: user
-          required: true
-          schema:
-            $ref: "#/definitions/database.User"
+      - description: Data user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -143,25 +209,98 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-        - BearerAuth: []
       summary: Menambahkan user baru
       tags:
-        - User
+      - User
+  /bulkdeletestaff:
+    delete:
+      consumes:
+      - application/json
+      description: Delete multiple staff members from the database
+      parameters:
+      - description: Staff IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Bulk delete staff
+      tags:
+      - Staff
+  /bulkupdatestaffstatus:
+    put:
+      consumes:
+      - application/json
+      description: Update status for multiple staff members
+      parameters:
+      - description: Staff IDs and status
+        in: body
+        name: data
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Bulk update staff status
+      tags:
+      - Staff
   /deleteproduk:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Menghapus produk berdasarkan ID
       parameters:
-        - description: Produk yang akan dihapus (berdasarkan ID)
-          in: body
-          name: produk
-          required: true
-          schema:
-            $ref: "#/definitions/database.Produk"
+      - description: Produk yang akan dihapus (berdasarkan ID)
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -176,24 +315,68 @@ paths:
               type: string
             type: object
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Hapus produk
       tags:
-        - Produk
+      - Produk
+  /deletestaff:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a staff member from the database
+      parameters:
+      - description: Staff ID
+        in: body
+        name: id
+        required: true
+        schema:
+          additionalProperties:
+            type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete staff
+      tags:
+      - Staff
   /deleteuser:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Menghapus user berdasarkan ID dari body JSON
       parameters:
-        - description: ID user yang akan dihapus
-          in: body
-          name: user
-          required: true
-          schema:
-            $ref: "#/definitions/database.User"
+      - description: ID user yang akan dihapus
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
       produces:
-        - application/json
+      - application/json
       responses:
         "204":
           description: No Content
@@ -205,25 +388,23 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-        - BearerAuth: []
       summary: Hapus user
       tags:
-        - User
+      - User
   /login:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Menghasilkan JWT token untuk autentikasi API
       parameters:
-        - description: User credentials
-          in: body
-          name: creds
-          required: true
-          schema:
-            $ref: "#/definitions/database.Credentials"
+      - description: User credentials
+        in: body
+        name: creds
+        required: true
+        schema:
+          $ref: '#/definitions/database.Credentials'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -251,21 +432,51 @@ paths:
             type: object
       summary: Generate JWT Token
       tags:
-        - Auth
+      - Auth
+  /makemestaff:
+    post:
+      consumes:
+      - application/json
+      description: Make me staff so I can get access to the database
+      parameters:
+      - description: Data staff
+        in: body
+        name: staff
+        required: true
+        schema:
+          $ref: '#/definitions/database.Staff'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Make me staff
+      tags:
+      - Staff
   /register:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Registers a new user in the database
       parameters:
-        - description: User credentials
-          in: body
-          name: creds
-          required: true
-          schema:
-            $ref: "#/definitions/database.Credentials"
+      - description: User credentials
+        in: body
+        name: creds
+        required: true
+        schema:
+          $ref: '#/definitions/database.Credentials'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -287,72 +498,238 @@ paths:
             type: object
       summary: Register a new user
       tags:
-        - Auth
+      - Auth
+  /searchstaff:
+    get:
+      consumes:
+      - application/json
+      description: Search for staff by name, email, phone, or status
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Staff'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search staff
+      tags:
+      - Staff
   /selectproduk:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Mengambil semua data produk dari database
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/database.Produk"
+              $ref: '#/definitions/database.Produk'
             type: array
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Ambil semua produk
       tags:
-        - Produk
+      - Produk
+  /selectprodukByid:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data produk berdasarkan ID
+      parameters:
+      - description: Product ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.Produk'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ambil produk berdasarkan ID
+      tags:
+      - Produk
   /selecttransaksi:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Mengambil semua data transaksi dari database
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/database.Transaksi"
+              $ref: '#/definitions/database.Transaksi'
             type: array
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Ambil semua transaksi
       tags:
-        - Transaksi
-  /selectuser:
+      - Transaksi
+  /soldproduk:
+    post:
+      consumes:
+      - application/json
+      description: Decreases stock in 'produk' table and records sale in 'stok_keluar'
+        table
+      parameters:
+      - description: List of sold items
+        in: body
+        name: soldItems
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/database.SoldItem'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sold items processed successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Endpoint to handle sold products
+      tags:
+      - Produk
+  /staff:
     get:
+      consumes:
+      - application/json
+      description: Get all staff from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Staff'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all staff
+      tags:
+      - Staff
+  /staff/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get staff by ID from the database
+      parameters:
+      - description: Staff ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.Staff'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get staff by ID
+      tags:
+      - Staff
+  /staffstats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics about staff members
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             additionalProperties: true
             type: object
-      security:
-        - BearerAuth: []
-      summary: Menampilakan semua user
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get staff statistics
       tags:
-        - User
+      - Staff
   /updateproduk:
     put:
       consumes:
-        - application/json
+      - application/json
       description: Memperbarui informasi produk berdasarkan ID
       parameters:
-        - description: Data produk yang diperbarui
-          in: body
-          name: produk
-          required: true
-          schema:
-            $ref: "#/definitions/database.Produk"
+      - description: Data produk yang diperbarui
+        in: body
+        name: produk
+        required: true
+        schema:
+          $ref: '#/definitions/database.Produk'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -367,24 +744,66 @@ paths:
               type: string
             type: object
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Update data produk
       tags:
-        - Produk
+      - Produk
+  /updatestaff:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing staff member in the database
+      parameters:
+      - description: Staff data
+        in: body
+        name: staff
+        required: true
+        schema:
+          $ref: '#/definitions/database.Staff'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update staff
+      tags:
+      - Staff
   /updateuser:
     put:
       consumes:
-        - application/json
+      - application/json
       description: Memperbarui data user berdasarkan ID
       parameters:
-        - description: Data user yang diperbarui
-          in: body
-          name: user
-          required: true
-          schema:
-            $ref: "#/definitions/database.User"
+      - description: Data user yang diperbarui
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
       produces:
-        - application/json
+      - application/json
       responses:
         "204":
           description: No Content
@@ -396,26 +815,29 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-        - BearerAuth: []
       summary: Update user
       tags:
-        - User
+      - User
   /user:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get list of all user from database
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/database.User"
+              $ref: '#/definitions/database.User'
             type: array
       summary: Get all user
       tags:
-        - User
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: token
+    type: apiKey
 swagger: "2.0"
