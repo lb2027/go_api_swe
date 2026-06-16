@@ -122,7 +122,9 @@ func main() {
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Content-Type", "token", "Authorization"},
+		// "*" makes rs/cors reflect back whatever request headers the browser
+		// sends, so preflight never fails on header name/order mismatches.
+		AllowedHeaders: []string{"*"},
 	})
 
 	handler := c.Handler(mux)
